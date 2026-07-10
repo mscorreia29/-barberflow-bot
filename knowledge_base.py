@@ -81,6 +81,9 @@ QUICK_RESPONSES = {
     "/sugestao": "Obrigado pela sugestao! Vou registrar no nosso backlog pra equipe avaliar.\n\nSua opniao e muito importante pra gente melhorar o BarberFlow! 😄",
     
     "/feedback": "Obrigado pelo feedback! Vou registrar no nosso backlog pra equipe avaliar.\n\nSua opniao e muito importante pra gente melhorar o BarberFlow! 😄",
+    
+    # Barbeiro
+    "/barbeiro": "Para vincular um barbeiro:\n1. Acesse barber-flow.store/barberflow\n2. Va em Barbeiros > Novo Barbeiro\n3. Preencha nome e email\n4. Defina uma senha\n5. Salve\n\nO acesso (login/senha) e gerado na hora! Voce copia e envia pelo WhatsApp pro barbeiro.",
 }
 
 # Saudacoes
@@ -101,7 +104,13 @@ PERGUNTAS_COMUNS = {
     
     "quanto custa": "O basico comeca em R$ 49,90/mes. Teste gratis por 7 dias primeiro!",
     
-    "barbeiro": "Voce pode adicionar quantos barbeiros quiser no plano Pro! No basico sao 3. Cadastre em barber-flow.store/barberflow",
+    "barbeiro": "Para vincular um barbeiro:\n1. Acesse barber-flow.store/barberflow\n2. Va em Barbeiros > Novo Barbeiro\n3. Preencha nome e email\n4. Defina uma senha\n5. Salve\n\nO acesso e gerado na hora! Voce pode copiar o login/senha e enviar pelo WhatsApp pro barbeiro.",
+    
+    "cadastrar barbeiro": "Para vincular um barbeiro:\n1. Acesse barber-flow.store/barberflow\n2. Va em Barbeiros > Novo Barbeiro\n3. Preencha nome e email\n4. Defina uma senha\n5. Salve\n\nO acesso e gerado na hora! Voce pode copiar o login/senha e enviar pelo WhatsApp pro barbeiro.",
+    
+    "acesso barbeiro": "O acesso do barbeiro e gerado ao cadastra-lo no painel. Voce recebe o login e senha e pode enviar pelo WhatsApp! Sem email.",
+    
+    "enviar acesso barbeiro": "Ao cadastrar o barbeiro, o sistema gera login e senha. Voce pode copiar e mandar pelo WhatsApp. Nao precisa de email!",
     
     "agendamento": "Clientes agendam 24h pelo link que voce compartilhar. Funciona automatico!",
     

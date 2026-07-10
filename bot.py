@@ -134,6 +134,17 @@ KEYWORD_RESPONSES = {
     "feedback": "/feedback",
     "critica": "/feedback",
     "critica construtiva": "/feedback",
+    
+    # Barbeiro
+    "barbeiro": "/barbeiro",
+    "como cadastro barbeiro": "/barbeiro",
+    "como adicionar barbeiro": "/barbeiro",
+    "cadastrar barbeiro": "/barbeiro",
+    "adicionar barbeiro": "/barbeiro",
+    "acesso barbeiro": "/barbeiro",
+    "enviar acesso barbeiro": "/barbeiro",
+    "barbeiro nao recebe": "/barbeiro",
+    "como mando acesso barbeiro": "/barbeiro",
 }
 
 # Palavras que indicam PROBLEMA - devem ir direto pra IA

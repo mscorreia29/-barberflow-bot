@@ -5,15 +5,13 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
 
-// Configuracoes
-const BOT_API_URL = 'http://127.0.0.1:5000';
+// URL da API no Railway (ALTERE PARA SEU LINK)
+const BOT_API_URL = process.env.BOT_API_URL || 'http://127.0.0.1:5000';
 const AUTH_DIR = path.join(__dirname, 'auth_state');
 const GROUPS_FILE = path.join(__dirname, 'groups.json');
 
-// Logger silencioso (so erros)
 const logger = pino({ level: 'silent' });
 
-// Carregar grupos ignorados
 let ignoredGroups = [];
 if (fs.existsSync(GROUPS_FILE)) {
     try {
@@ -27,12 +25,10 @@ function saveIgnoredGroups() {
     fs.writeFileSync(GROUPS_FILE, JSON.stringify(ignoredGroups, null, 2));
 }
 
-// Verificar se mensagem e comando de grupo
 function isGroupCommand(text) {
     return text.toLowerCase().startsWith('/grupo');
 }
 
-// Comandos de gerenciamento de grupo
 function handleGroupCommand(text, groupName) {
     const cmd = text.toLowerCase().trim();
     
@@ -40,9 +36,9 @@ function handleGroupCommand(text, groupName) {
         if (!ignoredGroups.includes(groupName)) {
             ignoredGroups.push(groupName);
             saveIgnoredGroups();
-            return `Grupo "${groupName}" adicionado a lista de ignorados. Mensagens deste grupo nao serao processadas.`;
+            return `Grupo "${groupName}" ignorado.`;
         }
-        return `Grupo "${groupName}" ja esta na lista de ignorados.`;
+        return `Grupo ja ignorado.`;
     }
     
     if (cmd === '/grupo permitir') {
@@ -50,35 +46,28 @@ function handleGroupCommand(text, groupName) {
         if (idx !== -1) {
             ignoredGroups.splice(idx, 1);
             saveIgnoredGroups();
-            return `Grupo "${groupName}" removido da lista de ignorados. Mensagens deste grupo serao processadas.`;
+            return `Grupo "${groupName}" ativado.`;
         }
-        return `Grupo "${groupName}" nao esta na lista de ignorados.`;
+        return `Grupo ja ativo.`;
     }
     
     if (cmd === '/grupo status') {
         const status = ignoredGroups.includes(groupName) ? 'IGNORADO' : 'ATIVO';
-        return `Status do grupo "${groupName}": ${status}`;
+        return `Status: ${status}`;
     }
     
-    return `Comandos de grupo disponiveis:\n/grupo ignorar - Ignorar mensagens deste grupo\n/grupo permitir - Processar mensagens deste grupo\n/grupo status - Ver status atual`;
+    return `Comandos:\n/grupo ignorar\n/grupo permitir\n/grupo status`;
 }
 
-// Enviar mensagem para o bot Python e obter resposta
 async function getBotResponse(phone, message, isGroup = false) {
     try {
         const response = await fetch(`${BOT_API_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                phone: phone,
-                message: message,
-                is_group: isGroup
-            })
+            body: JSON.stringify({ phone, message, is_group: isGroup })
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
         return data.response;
@@ -88,7 +77,6 @@ async function getBotResponse(phone, message, isGroup = false) {
     }
 }
 
-// Conectar ao WhatsApp
 async function connectToWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
     const { version } = await fetchLatestBaileysVersion();
@@ -101,7 +89,6 @@ async function connectToWhatsApp() {
         browser: ['BarberFlow Bot', 'Chrome', '1.0.0']
     });
     
-    // QR Code
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
         
@@ -117,7 +104,7 @@ async function connectToWhatsApp() {
             const statusCode = new Boom(lastDisconnect?.error)?.output?.statusCode;
             
             if (statusCode === DisconnectReason.loggedOut) {
-                console.log('Desconectado. Limpe a pasta auth_state e reinicie.');
+                console.log('Desconectado. Limpe auth_state e reinicie.');
                 process.exit(1);
             } else {
                 console.log('Desconectado. Reconectando...');
@@ -128,31 +115,25 @@ async function connectToWhatsApp() {
         if (connection === 'open') {
             console.log('===========================================');
             console.log('  BOT CONECTADO COM SUCESSO!');
+            console.log(`  API: ${BOT_API_URL}`);
             console.log('  Aguardando mensagens...');
-            console.log('  Pressione Ctrl+C para sair');
             console.log('===========================================\n');
         }
     });
     
-    // Salvar credenciais
     sock.ev.on('creds.update', saveCreds);
     
-    // Receber mensagens
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
         if (type !== 'notify') return;
         
         for (const msg of messages) {
-            // Ignorar mensagens proprias
             if (msg.key.fromMe) continue;
-            
-            // Ignorar mensagens de status
             if (msg.key.remoteJid === 'status@broadcast') continue;
             
             const isGroup = msg.key.remoteJid.endsWith('@g.us');
             const senderJid = isGroup ? msg.key.participant : msg.key.remoteJid;
             const chatJid = msg.key.remoteJid;
             
-            // Obter texto da mensagem
             let text = '';
             if (msg.message?.conversation) {
                 text = msg.message.conversation;
@@ -161,42 +142,33 @@ async function connectToWhatsApp() {
             } else if (msg.message?.imageMessage?.caption) {
                 text = msg.message.imageMessage.caption;
             } else {
-                continue; // Ignorar mensagens sem texto
+                continue;
             }
             
             if (!text.trim()) continue;
             
-            // Extrair nome do grupo se for grupo
             let groupName = '';
             if (isGroup) {
                 const groupMeta = await sock.groupMetadata(chatJid);
                 groupName = groupMeta.subject;
                 
-                // Verificar comandos de grupo
                 if (isGroupCommand(text)) {
                     const response = handleGroupCommand(text, groupName);
                     await sock.sendMessage(chatJid, { text: response });
                     continue;
                 }
                 
-                // Ignorar grupo se estiver na lista
-                if (ignoredGroups.includes(groupName)) {
-                    continue;
-                }
+                if (ignoredGroups.includes(groupName)) continue;
             }
             
-            // Formatar numero do telefone
             const phone = senderJid.replace(/@s\.whatsapp\.net$/, '').replace(/@.*$/, '');
             
             console.log(`[${isGroup ? 'GRUPO:' + groupName : 'DM'}] ${phone}: ${text.substring(0, 50)}...`);
             
-            // Obter resposta do bot
             const response = await getBotResponse(phone, text, isGroup);
             
             if (response) {
-                // Enviar resposta
                 if (isGroup) {
-                    // Em grupo, responder mencionando o usuario
                     await sock.sendMessage(chatJid, {
                         text: `@${phone.split('@')[0]} ${response}`,
                         mentions: [senderJid]
@@ -211,28 +183,26 @@ async function connectToWhatsApp() {
     });
 }
 
-// Iniciar
+// Verificar API
 console.log('===========================================');
 console.log('  BARBERFLOW WHATSAPP BOT');
-console.log('  Bridge de conexao');
 console.log('===========================================\n');
-console.log('Verificando se o bot Python esta rodando...\n');
+console.log(`Conectando a API: ${BOT_API_URL}\n`);
 
-// Verificar se bot Python esta rodando
 fetch(`${BOT_API_URL}/health`)
     .then(r => r.json())
     .then(data => {
         if (data.status === 'ok') {
-            console.log('Bot Python detectado! Iniciando conexao WhatsApp...\n');
+            console.log('API detectada! Iniciando WhatsApp...\n');
             connectToWhatsApp();
         } else {
-            console.error('Bot Python retornou resposta invalida.');
+            console.error('API retornou resposta invalida.');
             process.exit(1);
         }
     })
     .catch(err => {
-        console.error('ERRO: Bot Python nao esta rodando!');
-        console.error('Execute primeiro: python main.py');
+        console.error(`ERRO: API nao esta rodando em ${BOT_API_URL}`);
         console.error(`Erro: ${err.message}`);
+        console.error('\nVerifique se a API esta rodando no Railway.');
         process.exit(1);
     });

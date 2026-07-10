@@ -1,14 +1,25 @@
-# WhatsApp Bot BarberFlow - Logica Principal
+# WhatsApp Bot BarberFlow - Logica Principal (v2)
 from datetime import datetime
 from config import BOT_NAME, IGNORE_GROUPS
 from ai_handler import get_ai_response, should_transfer_to_human
-from knowledge_base import QUICK_RESPONSES
+from knowledge_base import QUICK_RESPONSES, SAUDACOES
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Palavras-chave que DEVEM retornar respostas rapidas (links)
 KEYWORD_RESPONSES = {
+    # Saudacao
+    "oi": "/ola",
+    "ola": "/ola",
+    "bom dia": "/ola",
+    "boa tarde": "/ola",
+    "boa noite": "/ola",
+    "e ai": "/ola",
+    "fala": "/ola",
+    "hello": "/ola",
+    "hi": "/ola",
+    "hey": "/ola",
+    
     # Teste gratis
     "teste": "/teste",
     "testar": "/teste",
@@ -20,6 +31,8 @@ KEYWORD_RESPONSES = {
     "teste gratis": "/teste",
     "7 dias": "/teste",
     "sete dias": "/teste",
+    "quero testar": "/teste",
+    "quero experimentar": "/teste",
     
     # Cadastro
     "cadastrar": "/cadastrar",
@@ -32,6 +45,8 @@ KEYWORD_RESPONSES = {
     "começar": "/cadastrar",
     "quero comecar": "/cadastrar",
     "quero começar": "/cadastrar",
+    "quero me cadastrar": "/cadastrar",
+    "como cadastro": "/cadastrar",
     
     # Login
     "login": "/login",
@@ -40,6 +55,7 @@ KEYWORD_RESPONSES = {
     "acessar minha conta": "/login",
     "minha conta": "/login",
     "esqueci a senha": "/login",
+    "entrar na conta": "/login",
     
     # App/Sistema
     "app": "/app",
@@ -52,6 +68,8 @@ KEYWORD_RESPONSES = {
     "onde acesso": "/app",
     "link": "/app",
     "url": "/app",
+    "como entro": "/app",
+    "onde baixo": "/app",
     
     # Site
     "site": "/site",
@@ -65,7 +83,10 @@ KEYWORD_RESPONSES = {
     "como usar": "/como",
     "como funciona": "/como",
     "como comeca": "/como",
-    "como começa": "/como",
+    "como funciona": "/como",
+    "me explica": "/como",
+    "como que e": "/como",
+    "como funciona o barberflow": "/como",
     "instrucoes": "/manual",
     "instruções": "/manual",
     "ajuda completa": "/manual",
@@ -81,6 +102,9 @@ KEYWORD_RESPONSES = {
     "básico": "/planos",
     "pro": "/planos",
     "profissional": "/planos",
+    "quanto e": "/planos",
+    "quanto vale": "/planos",
+    "mensalidade": "/planos",
     
     # Recursos
     "recurso": "/recurso",
@@ -89,6 +113,8 @@ KEYWORD_RESPONSES = {
     "funcionalidades": "/recurso",
     "o que faz": "/recurso",
     "o que tem": "/recurso",
+    "o que e": "/recurso",
+    "tem o que": "/recurso",
     
     # WhatsApp
     "whatsapp": "/whatsapp",
@@ -96,6 +122,7 @@ KEYWORD_RESPONSES = {
     "integracao whatsapp": "/whatsapp",
     "integração whatsapp": "/whatsapp",
     "mensagem automatica": "/whatsapp",
+    "envia mensagem": "/whatsapp",
     
     # Notificacoes
     "notificacao": "/notificacoes",
@@ -105,6 +132,7 @@ KEYWORD_RESPONSES = {
     "push": "/notificacoes",
     "lembrete": "/notificacoes",
     "lembretes": "/notificacoes",
+    "aviso": "/notificacoes",
     
     # Assinaturas
     "assinatura": "/assinaturas",
@@ -112,6 +140,7 @@ KEYWORD_RESPONSES = {
     "recorrente": "/assinaturas",
     "mensal": "/assinaturas",
     "recorrencia": "/assinaturas",
+    "cobranca": "/assinaturas",
     
     # Suporte
     "suporte": "/humano",
@@ -123,11 +152,21 @@ KEYWORD_RESPONSES = {
     "horario": "/horarios",
     "horário": "/horarios",
     "funcionamento": "/horarios",
+    "telefone": "/horarios",
+    "whatsapp suporte": "/humano",
     
     # Cancelar
-    "cancelar": "Para cancelar, acesse Configuracoes > Plano no painel. Sem multa.",
-    "cancelamento": "Para cancelar, acesse Configuracoes > Plano no painel. Sem multa.",
-    "desistir": "Para cancelar, acesse Configuracoes > Plano no painel. Sem multa.",
+    "cancelar": "/cancelar",
+    "cancelamento": "/cancelar",
+    "desistir": "/cancelar",
+    "quero cancelar": "/cancelar",
+    
+    # Barbeiro/Agendamento
+    "barbeiro": "/recurso",
+    "agendamento": "/recurso",
+    "agendar": "/recurso",
+    "comissao": "/recurso",
+    "comissao barbeiro": "/recurso",
     
     # Preco especifico
     "49": "/planos",
@@ -136,21 +175,27 @@ KEYWORD_RESPONSES = {
     "89,90": "/planos",
 }
 
+
 class WhatsAppBot:
     def __init__(self):
         self.conversations = {}
         self.transfer_users = set()
     
     def _find_quick_response(self, message: str) -> str | None:
-        """Busca resposta rapida baseada em palavras-chave"""
         msg_lower = message.lower().strip()
         
-        # Verificar respostas rapidas exatas primeiro
+        # Respostas rapidas exatas
         if msg_lower in QUICK_RESPONSES:
             return QUICK_RESPONSES[msg_lower]
         
-        # Buscar palavras-chave
-        for keyword, response_key in KEYWORD_RESPONSES.items():
+        # Saudacao simples (so 1-2 palavras)
+        words = msg_lower.split()
+        if len(words) <= 2 and any(s in msg_lower for s in SAUDACOES):
+            return QUICK_RESPONSES.get("/ola")
+        
+        # Buscar palavras-chave (mais longas primeiro)
+        sorted_keywords = sorted(KEYWORD_RESPONSES.items(), key=lambda x: len(x[0]), reverse=True)
+        for keyword, response_key in sorted_keywords:
             if keyword in msg_lower:
                 if response_key.startswith("/"):
                     return QUICK_RESPONSES.get(response_key)
@@ -159,34 +204,32 @@ class WhatsAppBot:
         return None
     
     def handle_message(self, phone: str, message: str, is_group: bool = False) -> str:
-        """Processa mensagem e retorna resposta"""
-        
         if is_group and IGNORE_GROUPS:
             return None
         
         phone = phone.replace("@s.whatsapp.net", "").replace("@g.us", "")
         
         if phone in self.transfer_users:
-            return "Atendente ira atende-lo em breve. Aguarde."
+            return "Atendente ira atende-lo em breve. Aguarde!"
         
         if phone not in self.conversations:
             self.conversations[phone] = []
         
         message = message.strip()
         
-        # 1. Tentar resposta rapida (links)
+        # 1. Resposta rapida (links)
         quick_response = self._find_quick_response(message)
         if quick_response:
             self.conversations[phone].append({"role": "user", "content": message})
             self.conversations[phone].append({"role": "assistant", "content": quick_response})
             return quick_response
         
-        # 2. Verificar transferencia para humano
+        # 2. Transferencia para humano
         if should_transfer_to_human(message):
             self.transfer_users.add(phone)
             return QUICK_RESPONSES["/humano"]
         
-        # 3. Usar IA (para perguntas complexas)
+        # 3. IA
         response = get_ai_response(message, self.conversations[phone])
         
         self.conversations[phone].append({"role": "user", "content": message})

@@ -1,5 +1,5 @@
-# Base de Conhecimento - BarberFlow (v2)
-# Respostas curtas e efetivas
+# Base de Conhecimento - BarberFlow (v3)
+# Respostas naturais e conversacionais
 
 KNOWLEDGE_BASE = {
     "sistema": {
@@ -24,71 +24,81 @@ KNOWLEDGE_BASE = {
             "Avaliacoes de clientes"
         ]
     },
-    
     "planos": {
         "basico": {"nome": "Basico", "preco": "R$ 49,90/mes", "profissionais": "Ate 3"},
         "pro": {"nome": "Pro", "preco": "R$ 89,90/mes", "profissionais": "Ilimitados"},
         "teste": {"nome": "Teste Gratis", "duracao": "7 dias", "plano": "Pro"}
     },
-    
     "suporte": {
         "horario": "Seg-Sab 9h-19h",
         "whatsapp": "(47) 99675-9164"
     }
 }
 
-# Respostas rapidas otimizadas
 QUICK_RESPONSES = {
-    # Links diretos
-    "/teste": "Teste gratis 7 dias do plano Pro!\n\nAcesse: barber-flow.store/barberflow\n\nNao precisa cartao de credito.",
+    # Saudacao
+    "/ola": "Ola! Tudo bem? 😊 Sou do suporte do BarberFlow. Como posso te ajudar?",
     
-    "/cadastrar": "Cadastre-se agora:\n\nbarber-flow.store/auth?mode=signup\n\nGratuito por 7 dias!",
+    # Links diretos - tom mais natural
+    "/teste": "Que bom! Teste gratis por 7 dias, sem precisar de cartao:\n\nbarber-flow.store/barberflow\n\nQualquer duvida, estou aqui!",
     
-    "/login": "Acesse sua conta:\n\nbarber-flow.store/auth",
+    "/cadastrar": "Crie sua conta gratuitamente:\n\nbarber-flow.store/auth?mode=signup\n\nRapido e facil! Precisa de ajuda com algo?",
     
-    "/app": "Acesse o BarberFlow:\n\nbarber-flow.store/barberflow",
+    "/login": "Pra acessar sua conta:\n\nbarber-flow.store/auth\n\nEsqueceu a senha? La tem a opcao de recuperar!",
     
-    "/site": "Site oficial:\n\nbarber-flow.store",
+    "/app": "Acesse o BarberFlow aqui:\n\nbarber-flow.store/barberflow\n\nFunciona pelo celular e computador, sem precisar instalar nada!",
     
-    "/manual": "Manual completo:\n\nbarber-flow.store/manual",
+    "/site": "Site oficial:\n\nbarber-flow.store\n\nLa voce encontra todas as informacoes!",
     
-    # Planos
-    "/planos": "*Planos:*\n\nBasico: R$ 49,90/mes\n- 3 profissionais\n- Agendamento online\n\nPro: R$ 89,90/mes\n- Ilimitado\n- Relatorios\n- WhatsApp\n- Notificacoes\n\nTeste gratis: 7 dias Pro",
+    "/manual": "Tem todo o passo a passo aqui:\n\nbarber-flow.store/manual\n\nSe tiver duvida em algo especifico, me fala que te ajudo!",
     
-    # Ajuda
-    "/ajuda": "Comandos:\n\n/teste - Testar gratis\n/cadastrar - Criar conta\n/login - Minha conta\n/app - Acessar sistema\n/planos - Ver planos\n/como - Como usar\n/problemas - Suporte\n/humano - Atendente",
+    # Planos - conversacional
+    "/planos": "Temos 2 opcoes:\n\n*Basico* - R$ 49,90/mes\nAte 3 profissionais\n\n*Pro* - R$ 89,90/mes\nIlimitado + relatorios + WhatsApp\n\nTeste 7 dias gratis antes de decidir!",
     
-    # Como usar
-    "/como": "Como usar o BarberFlow:\n\n1. Crie sua conta (gratuita)\n2. Cadastre servicos e precos\n3. Adicione seus barbeiros\n4. Configure horarios\n5. Compartilhe seu link\n\nClientes agendam 24h!",
+    # Como funciona - passo a passo natural
+    "/como": "Funciona assim:\n\n1. Cria sua conta (gratuita)\n2. Cadastra seus servicos\n3. Adiciona os barbeiros\n4. Configura os horarios\n5. Manda o link pros clientes\n\nPronto! Eles agendam sozinhos, 24h! 😄",
     
     # Suporte
-    "/problemas": "Descreva seu problema:\n1. O que aconteceu?\n2. Quando?\n3. Print (se possivel)",
+    "/problemas": "Me conta o que aconteceu:\n\n1. Qual o problema?\n2. Quando comecou?\n3. Consegue mandar um print?\n\nAssim consigo te ajudar melhor!",
     
-    "/horarios": f"Suporte: {KNOWLEDGE_BASE['suporte']['horario']}\nWhatsApp: {KNOWLEDGE_BASE['suporte']['whatsapp']}",
+    "/horarios": "Suporte:\nSeg-Sab das 9h as 19h\nWhatsApp: (47) 99675-9164",
     
-    "/humano": f"Falar com atendente:\n\nWhatsApp: {KNOWLEDGE_BASE['suporte']['whatsapp']}\nHorario: {KNOWLEDGE_BASE['suporte']['horario']}",
+    "/humano": "Vou te conectar com um atendente:\n\nWhatsApp: (47) 99675-9164\nHorario: Seg-Sab 9h-19h\n\nEle vai te atender rapidinho!",
     
-    # Recursos
-    "/recurso": "*Recursos do BarberFlow:*\n\n- Agenda online 24h\n- App para clientes\n- Relatorios\n- Comissoes\n- WhatsApp automation\n- Assinaturas\n- Estoque\n- Avaliacoes",
+    # Recursos - beneficios
+    "/recurso": "O BarberFlow tem tudo que sua barbearia precisa:\n\n- Agendamento online 24h\n- Notificacoes automaticas\n- Relatorios de faturamento\n- Comissoes dos barbeiros\n- Assinaturas recorrentes\n\nQuer saber mais sobre algum?",
     
-    "/whatsapp": "Integracao WhatsApp:\n\nEnvia lembretes e confirmacoes automaticamente. Disponivel no plano Pro.",
+    "/whatsapp": "Integracao com WhatsApp:\n\nManda lembretes e confirmacoes automaticamente pros clientes. No plano Pro!",
     
-    "/notificacoes": "Notificacoes push:\n\nLembretes 1h antes do horario. Disponivel no plano Pro.",
+    "/notificacoes": "Notificacoes push:\n\nClientes recebem lembrete 1h antes do horario. Elimina faltas! Plano Pro.",
     
-    "/assinaturas": "Assinaturas recorrentes:\n\nCrie planos mensais para clientes. Cobranca via Mercado Pago. Plano Pro."
+    "/assinaturas": "Assinaturas recorrentes:\n\nCria planos mensais pros seus clientes. Cobranca automatica via Mercado Pago. Plano Pro.",
+    
+    # Cancelar
+    "/cancelar": "Para cancelar, va em Configuracoes > Plano no painel.\n\nSem multa, sem burocracia. Mas antes, me conta o que aconteceu? Talvez eu possa ajudar!"
 }
 
-# Respostas para perguntas comuns (a IA vai usar como referencia)
+# Saudacoes
+SAUDACOES = ["oi", "ola", "bom dia", "boa tarde", "boa noite", "e ai", "fala", "hello", "hi", "hey", "bom dia", "boa tarde", "boa noite"]
+
 PERGUNTAS_COMUNS = {
-    "teste gratis": "O BarberFlow oferece 7 dias de teste gratuito do plano Pro. Acesse barber-flow.store/barberflow e crie sua conta. Nao precisa cartao de credito.",
+    "teste gratis": "Teste 7 dias do plano Pro, sem cartao de credito. Acesse barber-flow.store/barberflow e crie sua conta!",
     
-    "como comecar": "Para comecar:\n1. Acesse barber-flow.store/auth?mode=signup\n2. Crie sua conta\n3. Cadastre servicos\n4. Adicione barbeiros\n5. Compartilhe seu link\n\nClientes agendam 24h!",
+    "como comecar": "E bem facil!\n1. Crie sua conta em barber-flow.store/auth?mode=signup\n2. Cadastre seus servicos\n3. Adicione os barbeiros\n4. Compartilhe o link\n\nPronto, clientes agendam 24h!",
     
-    "preco": "Planos:\n- Basico: R$ 49,90/mes (3 profissionais)\n- Pro: R$ 89,90/mes (ilimitados)\n- Teste gratis: 7 dias Pro",
+    "preco": "Temos 2 planos:\n- Basico: R$ 49,90/mes (3 profissionais)\n- Pro: R$ 89,90/mes (ilimitados)\n\nTeste 7 dias gratis antes!",
     
-    "cancelar": "Para cancelar, acesse Configuracoes > Plano no painel. Sem multa ou burocracia.",
+    "cancelar": "Sem problemas! Va em Configuracoes > Plano e cancele. Sem multa. Mas me conta, algo te desagradou?",
     
-    "sincronizar": "O BarberFlow funciona 100% online. Dados sincronizam automaticamente em todos os dispositivos.",
+    "sincronizar": "O BarberFlow funciona 100% online! Seus dados atualizam automaticamente no celular e computador.",
     
-    "app": "O BarberFlow funciona pelo navegador (barber-flow.store/barberflow). Nao precisa instalar nada!"
+    "app": "Funciona pelo navegador, sem instalar nada! Acesse barber-flow.store/barberflow\n\nFunciona em qualquer celular ou PC!",
+    
+    "quanto custa": "O basico comeca em R$ 49,90/mes. Teste gratis por 7 dias primeiro!",
+    
+    "barbeiro": "Voce pode adicionar quantos barbeiros quiser no plano Pro! No basico sao 3. Cadastre em barber-flow.store/barberflow",
+    
+    "agendamento": "Clientes agendam 24h pelo link que voce compartilhar. Funciona automatico!",
+    
+    "comissao": "O sistema calcula comissao dos barbeiros automatico! Plano Pro."
 }

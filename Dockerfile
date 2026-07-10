@@ -22,8 +22,9 @@ COPY . .
 # Criar pasta para sessão do WhatsApp
 RUN mkdir -p whatsapp-bridge/auth_state
 
-# Porta da API
+# Porta padrão do Railway
+ENV PORT=5000
 EXPOSE 5000
 
-# Rodar API e WhatsApp Bridge juntos
-CMD ["sh", "-c", "python3 api_server.py & cd whatsapp-bridge && node index.js"]
+# Rodar API primeiro, depois WhatsApp Bridge
+CMD ["sh", "-c", "python3 api_server.py & sleep 3 && cd whatsapp-bridge && node index.js"]

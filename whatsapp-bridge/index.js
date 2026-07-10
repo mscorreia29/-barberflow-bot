@@ -6,7 +6,8 @@ const fs = require('fs');
 const path = require('path');
 
 // API interna do Railway
-const BOT_API_URL = process.env.BOT_API_URL || 'http://127.0.0.1:5000';
+const API_PORT = process.env.PORT || 5000;
+const BOT_API_URL = `http://127.0.0.1:${API_PORT}`;
 const AUTH_DIR = path.join(__dirname, 'auth_state');
 const GROUPS_FILE = path.join(__dirname, 'groups.json');
 const QR_FILE = path.join(__dirname, 'qrcode.png');

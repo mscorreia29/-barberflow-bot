@@ -15,10 +15,9 @@ RUN cd whatsapp-bridge && npm install
 
 COPY . .
 
-RUN chmod +x start.sh
 RUN mkdir -p whatsapp-bridge/auth_state
 
 ENV PORT=5000
 EXPOSE 5000
 
-CMD ["sh", "start.sh"]
+CMD ["sh", "-c", "python3 api_server.py 2>&1 & sleep 5 && cd whatsapp-bridge && node index.js 2>&1 && wait"]

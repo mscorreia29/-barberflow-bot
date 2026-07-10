@@ -1,14 +1,15 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
 const pino = require('pino');
-const qrcode = require('qrcode-terminal');
+const { toBuffer } = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
-// URL da API no Railway (ALTERE PARA SEU LINK)
+// API interna do Railway
 const BOT_API_URL = process.env.BOT_API_URL || 'http://127.0.0.1:5000';
 const AUTH_DIR = path.join(__dirname, 'auth_state');
 const GROUPS_FILE = path.join(__dirname, 'groups.json');
+const QR_FILE = path.join(__dirname, 'qrcode.png');
 
 const logger = pino({ level: 'silent' });
 
@@ -25,40 +26,6 @@ function saveIgnoredGroups() {
     fs.writeFileSync(GROUPS_FILE, JSON.stringify(ignoredGroups, null, 2));
 }
 
-function isGroupCommand(text) {
-    return text.toLowerCase().startsWith('/grupo');
-}
-
-function handleGroupCommand(text, groupName) {
-    const cmd = text.toLowerCase().trim();
-    
-    if (cmd === '/grupo ignorar') {
-        if (!ignoredGroups.includes(groupName)) {
-            ignoredGroups.push(groupName);
-            saveIgnoredGroups();
-            return `Grupo "${groupName}" ignorado.`;
-        }
-        return `Grupo ja ignorado.`;
-    }
-    
-    if (cmd === '/grupo permitir') {
-        const idx = ignoredGroups.indexOf(groupName);
-        if (idx !== -1) {
-            ignoredGroups.splice(idx, 1);
-            saveIgnoredGroups();
-            return `Grupo "${groupName}" ativado.`;
-        }
-        return `Grupo ja ativo.`;
-    }
-    
-    if (cmd === '/grupo status') {
-        const status = ignoredGroups.includes(groupName) ? 'IGNORADO' : 'ATIVO';
-        return `Status: ${status}`;
-    }
-    
-    return `Comandos:\n/grupo ignorar\n/grupo permitir\n/grupo status`;
-}
-
 async function getBotResponse(phone, message, isGroup = false) {
     try {
         const response = await fetch(`${BOT_API_URL}/chat`, {
@@ -68,7 +35,6 @@ async function getBotResponse(phone, message, isGroup = false) {
         });
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
         const data = await response.json();
         return data.response;
     } catch (error) {
@@ -89,23 +55,36 @@ async function connectToWhatsApp() {
         browser: ['BarberFlow Bot', 'Chrome', '1.0.0']
     });
     
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
         
         if (qr) {
             console.log('\n===========================================');
-            console.log('  ESCANEIE O QR CODE COM SEU WHATSAPP');
-            console.log('===========================================\n');
+            console.log('  QR CODE GERADO!');
+            console.log('===========================================');
+            console.log('Acesse http://localhost:5000/qr para escanear');
+            console.log('Ou veja o QR no terminal abaixo:\n');
+            
+            // Salvar QR como imagem
+            const qrBuffer = await toBuffer(qr);
+            fs.writeFileSync(QR_FILE, qrBuffer);
+            console.log('QR salvo em: whatsapp-bridge/qrcode.png\n');
+            
+            // Gerar QR no terminal (fallback)
+            const qrcode = require('qrcode-terminal');
             qrcode.generate(qr, { small: true });
-            console.log('\nApos escanear, aguarde a conexao...\n');
         }
         
         if (connection === 'close') {
             const statusCode = new Boom(lastDisconnect?.error)?.output?.statusCode;
             
             if (statusCode === DisconnectReason.loggedOut) {
-                console.log('Desconectado. Limpe auth_state e reinicie.');
-                process.exit(1);
+                console.log('Desconectado. Sessao invalida.');
+                // Limpar auth para gerar novo QR
+                if (fs.existsSync(AUTH_DIR)) {
+                    fs.rmSync(AUTH_DIR, { recursive: true });
+                }
+                connectToWhatsApp();
             } else {
                 console.log('Desconectado. Reconectando...');
                 connectToWhatsApp();
@@ -114,10 +93,12 @@ async function connectToWhatsApp() {
         
         if (connection === 'open') {
             console.log('===========================================');
-            console.log('  BOT CONECTADO COM SUCESSO!');
-            console.log(`  API: ${BOT_API_URL}`);
-            console.log('  Aguardando mensagens...');
-            console.log('===========================================\n');
+            console.log('  BOT WHATSAPP CONECTADO!');
+            console.log('===========================================');
+            // Remover QR antigo
+            if (fs.existsSync(QR_FILE)) {
+                fs.unlinkSync(QR_FILE);
+            }
         }
     });
     
@@ -151,13 +132,6 @@ async function connectToWhatsApp() {
             if (isGroup) {
                 const groupMeta = await sock.groupMetadata(chatJid);
                 groupName = groupMeta.subject;
-                
-                if (isGroupCommand(text)) {
-                    const response = handleGroupCommand(text, groupName);
-                    await sock.sendMessage(chatJid, { text: response });
-                    continue;
-                }
-                
                 if (ignoredGroups.includes(groupName)) continue;
             }
             
@@ -176,33 +150,15 @@ async function connectToWhatsApp() {
                 } else {
                     await sock.sendMessage(chatJid, { text: response });
                 }
-                
                 console.log(`Resposta enviada para ${phone}`);
             }
         }
     });
 }
 
-// Verificar API
+// Iniciar
 console.log('===========================================');
 console.log('  BARBERFLOW WHATSAPP BOT');
 console.log('===========================================\n');
-console.log(`Conectando a API: ${BOT_API_URL}\n`);
 
-fetch(`${BOT_API_URL}/health`)
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'ok') {
-            console.log('API detectada! Iniciando WhatsApp...\n');
-            connectToWhatsApp();
-        } else {
-            console.error('API retornou resposta invalida.');
-            process.exit(1);
-        }
-    })
-    .catch(err => {
-        console.error(`ERRO: API nao esta rodando em ${BOT_API_URL}`);
-        console.error(`Erro: ${err.message}`);
-        console.error('\nVerifique se a API esta rodando no Railway.');
-        process.exit(1);
-    });
+connectToWhatsApp();

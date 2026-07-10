@@ -3,16 +3,25 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from bot import bot
 from config import BOT_NAME
+import os
 
 app = Flask(__name__)
+QR_FILE = os.path.join(os.path.dirname(__file__), 'whatsapp-bridge', 'qrcode.png')
 
 @app.route('/', methods=['GET'])
 def root():
-    """Página inicial"""
-    return jsonify({"message": "BarberFlow Bot API", "status": "running", "endpoints": ["/health", "/chat", "/stats"]})
+    """Pagina inicial"""
+    return jsonify({"message": "BarberFlow Bot API", "status": "running", "endpoints": ["/health", "/chat", "/stats", "/qr"]})
+
+@app.route('/qr', methods=['GET'])
+def qr_code():
+    """Exibir QR Code para conectar WhatsApp"""
+    if os.path.exists(QR_FILE):
+        return send_file(QR_FILE, mimetype='image/png')
+    return jsonify({"error": "QR Code ainda nao gerado. Aguarde..."}), 404
 
 @app.route('/health', methods=['GET'])
 def health():

@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y curl && \
 
 WORKDIR /app
 
-# Copiar dependências Python primeiro
+# Copiar dependências Python
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -19,8 +19,11 @@ RUN cd whatsapp-bridge && npm install
 # Copiar código
 COPY . .
 
+# Criar pasta para sessão do WhatsApp
+RUN mkdir -p whatsapp-bridge/auth_state
+
 # Porta da API
 EXPOSE 5000
 
-# Apenas API Server (WhatsApp Bridge roda separado depois)
-CMD ["python3", "api_server.py"]
+# Rodar API e WhatsApp Bridge juntos
+CMD ["sh", "-c", "python3 api_server.py & cd whatsapp-bridge && node index.js"]

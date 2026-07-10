@@ -20,4 +20,4 @@ RUN mkdir -p whatsapp-bridge/auth_state
 ENV PORT=5000
 EXPOSE 5000
 
-CMD ["python3", "runner.py"]
+CMD ["python3", "api_server.py"]

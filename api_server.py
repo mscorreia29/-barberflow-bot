@@ -4,21 +4,33 @@ import os
 import threading
 import time
 
+bridge_status = {"running": False, "pid": None, "exit_code": None}
+
 def start_bridge():
-    time.sleep(5)
+    global bridge_status
+    time.sleep(3)
     print("[API] Starting WhatsApp Bridge...", flush=True)
     try:
+        log_file = open("/app/bridge.log", "w")
         proc = subprocess.Popen(
             ["node", "index.js"],
             cwd="/app/whatsapp-bridge",
-            stdout=subprocess.PIPE,
+            stdout=log_file,
             stderr=subprocess.STDOUT
         )
-        for line in proc.stdout:
-            print(f"[Bridge] {line.decode('utf-8', errors='replace').strip()}", flush=True)
-        print(f"[API] Bridge exited with code {proc.returncode}", flush=True)
+        bridge_status = {"running": True, "pid": proc.pid, "exit_code": None}
+        print(f"[API] Bridge started PID={proc.pid}", flush=True)
+        proc.wait()
+        bridge_status["running"] = False
+        bridge_status["exit_code"] = proc.returncode
+        print(f"[API] Bridge exited code={proc.returncode}. Restarting in 5s...", flush=True)
+        time.sleep(5)
+        start_bridge()
     except Exception as e:
+        bridge_status["running"] = False
         print(f"[API] Bridge error: {e}", flush=True)
+        time.sleep(5)
+        start_bridge()
 
 t = threading.Thread(target=start_bridge, daemon=True)
 t.start()
@@ -63,7 +75,16 @@ def chat():
 
 @app.route('/stats')
 def stats():
-    return jsonify(bot.get_stats())
+    s = bot.get_stats()
+    s["bridge"] = bridge_status
+    log = ""
+    try:
+        with open("/app/bridge.log") as f:
+            log = f.read()[-2000:]
+    except:
+        pass
+    s["bridge_log"] = log
+    return jsonify(s)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

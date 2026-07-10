@@ -49,7 +49,9 @@ def stats():
     return jsonify(stats)
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
     print(f"Iniciando API do {BOT_NAME}...")
-    print("API rodando em http://127.0.0.1:5000")
+    print(f"API rodando em http://0.0.0.0:{port}")
     print("Aguardando conexoes do WhatsApp Bridge...\n")
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

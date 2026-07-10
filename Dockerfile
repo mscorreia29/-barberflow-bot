@@ -20,4 +20,4 @@ RUN mkdir -p whatsapp-bridge/auth_state
 ENV PORT=5000
 EXPOSE 5000
 
-CMD ["sh", "-c", "python3 api_server.py 2>&1 & sleep 5 && cd whatsapp-bridge && node index.js 2>&1 && wait"]
+CMD ["sh", "-c", "python3 api_server.py 2>&1 & sleep 3 && cd whatsapp-bridge && node index.js > /app/bridge.log 2>&1; echo 'BRIDGE EXITED' >> /app/bridge.log; wait"]

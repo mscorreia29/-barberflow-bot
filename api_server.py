@@ -22,6 +22,15 @@ def qr_code():
         return send_file(QR_FILE, mimetype='image/png')
     return jsonify({"error": "QR Code ainda nao gerado. Aguarde...", "path_checked": QR_FILE, "exists": os.path.exists(QR_FILE)}), 404
 
+@app.route('/logs', methods=['GET'])
+def logs():
+    try:
+        with open('/app/bridge.log', 'r') as f:
+            content = f.read()
+        return content, 200, {'Content-Type': 'text/plain'}
+    except:
+        return jsonify({"error": "bridge.log nao existe ainda"}), 404
+
 @app.route('/debug', methods=['GET'])
 def debug():
     port = os.environ.get('PORT', 'not set')

@@ -9,6 +9,11 @@ from config import BOT_NAME
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def root():
+    """Página inicial"""
+    return jsonify({"message": "BarberFlow Bot API", "status": "running", "endpoints": ["/health", "/chat", "/stats"]})
+
 @app.route('/health', methods=['GET'])
 def health():
     """Verificar se a API esta rodando"""
@@ -30,7 +35,6 @@ def chat():
         if not phone or not message:
             return jsonify({"error": "phone e message sao obrigatorios"}), 400
         
-        # Processar mensagem
         response = bot.handle_message(phone, message, is_group)
         
         return jsonify({
@@ -49,9 +53,9 @@ def stats():
     return jsonify(stats)
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))
     print(f"Iniciando API do {BOT_NAME}...")
     print(f"API rodando em http://0.0.0.0:{port}")
-    print("Aguardando conexoes do WhatsApp Bridge...\n")
+    print(f"Health check: http://0.0.0.0:{port}/health")
+    print("Aguardando conexoes...\n")
     app.run(host='0.0.0.0', port=port, debug=False)

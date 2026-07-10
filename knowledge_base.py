@@ -40,7 +40,7 @@ QUICK_RESPONSES = {
     "/ola": "Ola! Tudo bem? 😊 Sou do suporte do BarberFlow. Como posso te ajudar?",
     
     # Links diretos - tom mais natural
-    "/teste": "Que bom! Teste gratis por 7 dias, sem precisar de cartao:\n\nbarber-flow.store/barberflow\n\nQualquer duvida, estou aqui!",
+    "/teste": "Teste gratis por 7 dias! Acesso completo ao plano Pro.\n\nApos 7 dias, o acesso e bloqueado e voce escolhe um plano pra continuar:\n- Basico: R$ 49,90/mes\n- Pro: R$ 89,90/mes\n\nSem cartao de credito. Comece agora:\nbarber-flow.store/barberflow",
     
     "/cadastrar": "Crie sua conta gratuitamente:\n\nbarber-flow.store/auth?mode=signup\n\nRapido e facil! Precisa de ajuda com algo?",
     
@@ -75,7 +75,12 @@ QUICK_RESPONSES = {
     "/assinaturas": "Assinaturas recorrentes:\n\nCria planos mensais pros seus clientes. Cobranca automatica via Mercado Pago. Plano Pro.",
     
     # Cancelar
-    "/cancelar": "Para cancelar, va em Configuracoes > Plano no painel.\n\nSem multa, sem burocracia. Mas antes, me conta o que aconteceu? Talvez eu possa ajudar!"
+    "/cancelar": "Para cancelar, va em Configuracoes > Plano no painel.\n\nSem multa, sem burocracia. Mas antes, me conta o que aconteceu? Talvez eu possa ajudar!",
+    
+    # Sugestoes/Melhorias
+    "/sugestao": "Obrigado pela sugestao! Vou registrar no nosso backlog pra equipe avaliar.\n\nSua opniao e muito importante pra gente melhorar o BarberFlow! 😄",
+    
+    "/feedback": "Obrigado pelo feedback! Vou registrar no nosso backlog pra equipe avaliar.\n\nSua opniao e muito importante pra gente melhorar o BarberFlow! 😄",
 }
 
 # Saudacoes

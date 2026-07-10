@@ -117,6 +117,23 @@ KEYWORD_RESPONSES = {
     "como cancelo": "/cancelar",
     "cancelar plano": "/cancelar",
     "cancelar assinatura": "/cancelar",
+    
+    # Sugestoes/Melhorias
+    "sugestao": "/sugestao",
+    "sugiro": "/sugestao",
+    "melhoria": "/sugestao",
+    "melhorar": "/sugestao",
+    "seria legal": "/sugestao",
+    "podia ter": "/sugestao",
+    "falta": "/sugestao",
+    "funcionalidade": "/sugestao",
+    "recurso": "/sugestao",
+    "ideia": "/sugestao",
+    "opiniao": "/sugestao",
+    "opinião": "/sugestao",
+    "feedback": "/feedback",
+    "critica": "/feedback",
+    "critica construtiva": "/feedback",
 }
 
 # Palavras que indicam PROBLEMA - devem ir direto pra IA

@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y curl && \
 
 WORKDIR /app
 
-# Copiar dependências Python primeiro (melhor cache)
+# Copiar dependências Python primeiro
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -22,5 +22,5 @@ COPY . .
 # Porta da API
 EXPOSE 5000
 
-# Comando para rodar
-CMD ["sh", "-c", "python3 api_server.py & cd whatsapp-bridge && node index.js"]
+# Apenas API Server (WhatsApp Bridge roda separado depois)
+CMD ["python3", "api_server.py"]

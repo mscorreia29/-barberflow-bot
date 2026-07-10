@@ -3,13 +3,14 @@ import sys
 import os
 import threading
 import time
+from datetime import datetime
 
-bridge_status = {"running": False, "pid": None, "exit_code": None}
+bridge_status = {"running": False, "pid": None, "exit_code": None, "started_at": None}
 
 def start_bridge():
     global bridge_status
     time.sleep(3)
-    print("[API] Starting WhatsApp Bridge...", flush=True)
+    print(f"[API] Starting WhatsApp Bridge... {datetime.now()}", flush=True)
     try:
         log_file = open("/app/bridge.log", "w")
         proc = subprocess.Popen(
@@ -18,7 +19,7 @@ def start_bridge():
             stdout=log_file,
             stderr=subprocess.STDOUT
         )
-        bridge_status = {"running": True, "pid": proc.pid, "exit_code": None}
+        bridge_status = {"running": True, "pid": proc.pid, "exit_code": None, "started_at": str(datetime.now())}
         print(f"[API] Bridge started PID={proc.pid}", flush=True)
         proc.wait()
         bridge_status["running"] = False
@@ -49,7 +50,7 @@ def root():
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "ok", "bot": BOT_NAME})
+    return jsonify({"status": "ok", "bot": BOT_NAME, "bridge_running": bridge_status.get("running", False)})
 
 @app.route('/qr')
 def qr_code():
@@ -77,13 +78,11 @@ def chat():
 def stats():
     s = bot.get_stats()
     s["bridge"] = bridge_status
-    log = ""
     try:
         with open("/app/bridge.log") as f:
-            log = f.read()[-2000:]
+            s["bridge_log"] = f.read()[-1500:]
     except:
-        pass
-    s["bridge_log"] = log
+        s["bridge_log"] = ""
     return jsonify(s)
 
 if __name__ == '__main__':

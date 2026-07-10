@@ -47,7 +47,6 @@ async function connectToWhatsApp() {
     try {
         console.log('[Bridge] Iniciando conexao WhatsApp...');
         console.log(`[Bridge] API URL: ${BOT_API_URL}`);
-        console.log(`[Bridge] AUTH_DIR: ${AUTH_DIR}`);
 
         const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
         const { version } = await fetchLatestBaileysVersion();
@@ -57,20 +56,21 @@ async function connectToWhatsApp() {
             version,
             auth: state,
             logger,
-            printQRInTerminal: true,
-            browser: ['BarberFlow Bot', 'Chrome', '1.0.0']
+            printQRInTerminal: false,
+            browser: ['BarberFlow Bot', 'Chrome', '1.0.0'],
+            markOnlineOnConnect: true
         });
 
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
-            console.log(`[Bridge] Connection update: ${connection || 'none'}, qr: ${qr ? 'YES' : 'no'}`);
+            console.log(`[Bridge] Connection: ${connection || 'none'}, qr: ${qr ? 'YES' : 'no'}`);
 
             if (qr) {
                 console.log('[Bridge] QR CODE RECEBIDO!');
                 try {
                     const qrBuffer = await toBuffer(qr);
                     fs.writeFileSync(QR_FILE, qrBuffer);
-                    console.log(`[Bridge] QR salvo em: ${QR_FILE} (${qrBuffer.length} bytes)`);
+                    console.log(`[Bridge] QR salvo: ${qrBuffer.length} bytes`);
                 } catch (e) {
                     console.error('[Bridge] Erro ao salvar QR:', e.message);
                 }
@@ -87,7 +87,7 @@ async function connectToWhatsApp() {
             }
 
             if (connection === 'open') {
-                console.log('[Bridge] CONECTADO AO WHATSAPP!');
+                console.log('[Bridge] CONECTADO!');
                 if (fs.existsSync(QR_FILE)) fs.unlinkSync(QR_FILE);
             }
         });
@@ -109,32 +109,40 @@ async function connectToWhatsApp() {
                 if (msg.message?.conversation) text = msg.message.conversation;
                 else if (msg.message?.extendedTextMessage?.text) text = msg.message.extendedTextMessage.text;
                 else if (msg.message?.imageMessage?.caption) text = msg.message.imageMessage.caption;
+                else if (msg.message?.buttonsResponseMessage?.selectedButtonId) text = msg.message.buttonsResponseMessage.selectedButtonId;
+                else if (msg.message?.listResponseMessage?.singleSelectReply?.selectedRowId) text = msg.message.listResponseMessage.singleSelectReply.selectedRowId;
                 else continue;
 
                 if (!text.trim()) continue;
 
                 if (isGroup) {
-                    const groupMeta = await sock.groupMetadata(chatJid);
-                    if (ignoredGroups.includes(groupMeta.subject)) continue;
+                    try {
+                        const groupMeta = await sock.groupMetadata(chatJid);
+                        if (ignoredGroups.includes(groupMeta.subject)) continue;
+                    } catch (e) {}
                 }
 
                 const phone = senderJid.replace(/@s\.whatsapp\.net$/, '').replace(/@.*$/, '');
-                console.log(`[Bridge] [${isGroup ? 'GRUPO' : 'DM'}] ${phone}: ${text.substring(0, 50)}`);
+                console.log(`[Bridge] [${isGroup ? 'GRUPO' : 'DM'}] ${phone}: ${text.substring(0, 80)}`);
 
                 const response = await getBotResponse(phone, text, isGroup);
 
                 if (response) {
-                    if (isGroup) {
-                        await sock.sendMessage(chatJid, { text: `@${phone.split('@')[0]} ${response}`, mentions: [senderJid] });
-                    } else {
-                        await sock.sendMessage(chatJid, { text: response });
+                    try {
+                        if (isGroup) {
+                            await sock.sendMessage(chatJid, { text: `@${phone.split('@')[0]} ${response}`, mentions: [senderJid] });
+                        } else {
+                            await sock.sendMessage(chatJid, { text: response });
+                        }
+                        console.log(`[Bridge] Resposta enviada para ${phone}`);
+                    } catch (e) {
+                        console.error(`[Bridge] Erro ao enviar para ${phone}:`, e.message);
                     }
-                    console.log(`[Bridge] Resposta enviada para ${phone}`);
                 }
             }
         });
 
-        console.log('[Bridge] Socket criado com sucesso, aguardando conexao...');
+        console.log('[Bridge] Socket criado, aguardando conexao...');
     } catch (error) {
         console.error('[Bridge] ERRO FATAL:', error.message);
         console.error(error.stack);

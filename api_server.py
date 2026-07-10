@@ -35,24 +35,43 @@ def logs():
 def debug():
     port = os.environ.get('PORT', 'not set')
     node_running = False
+    runner_running = False
     try:
         result = subprocess.run(['pgrep', '-f', 'node index.js'], capture_output=True, text=True)
         node_running = result.returncode == 0
     except:
         pass
+    try:
+        result = subprocess.run(['pgrep', '-f', 'runner.py'], capture_output=True, text=True)
+        runner_running = result.returncode == 0
+    except:
+        pass
 
     qr_exists = os.path.exists(QR_FILE)
     qr_size = os.path.getsize(QR_FILE) if qr_exists else 0
-
     auth_exists = os.path.exists('/app/whatsapp-bridge/auth_state')
+
+    import glob
+    log_files = glob.glob('/app/*.log')
+
+    logs_content = {}
+    for lf in log_files:
+        try:
+            with open(lf) as f:
+                logs_content[os.path.basename(lf)] = f.read()[-2000:]
+        except:
+            pass
 
     return jsonify({
         "port": port,
+        "runner_running": runner_running,
         "node_bridge_running": node_running,
         "qr_file_exists": qr_exists,
         "qr_file_size": qr_size,
         "auth_state_exists": auth_exists,
-        "bot_api_url": f"http://127.0.0.1:{port}"
+        "bot_api_url": f"http://127.0.0.1:{port}",
+        "log_files": log_files,
+        "logs": logs_content
     })
 
 @app.route('/health', methods=['GET'])

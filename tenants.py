@@ -54,6 +54,7 @@ DEFAULT_CONFIG = {
 class TenantManager:
     def __init__(self):
         self._ensure_admin()
+        self._ensure_barberflow_tenant()
     
     def _ensure_admin(self):
         admin = load_json(ADMIN_FILE, None)
@@ -64,6 +65,36 @@ class TenantManager:
                 "created_at": datetime.now().isoformat()
             }
             save_json(ADMIN_FILE, admin)
+    
+    def _ensure_barberflow_tenant(self):
+        tenants = self.get_all()
+        for t in tenants:
+            if t.get("business_type") == "barbearia" and t.get("is_default"):
+                return
+        tenant, err = self.create(
+            name="BarberFlow Suporte",
+            email="barberflow@autoassist.com",
+            password="barberflow2026",
+            business_name="BarberFlow",
+            business_type="barbearia"
+        )
+        if tenant:
+            kf = {
+                "bot_name": "BarberFlow Suporte",
+                "business_name": "BarberFlow",
+                "business_type": "barbearia",
+                "greeting": "Ola! Sou o suporte do BarberFlow. Como posso te ajudar?",
+                "responses": {}
+            }
+            save_json(self._tenant_file(tenant["id"], "knowledge.json"), kf)
+            tenants = self.get_all()
+            for t in tenants:
+                if t["id"] == tenant["id"]:
+                    t["is_default"] = True
+                    t["plan"] = "pro"
+                    t["status"] = "active"
+                    break
+            save_json(os.path.join(DATA_DIR, "tenants.json"), tenants)
     
     def _tenant_dir(self, tenant_id):
         d = os.path.join(TENANTS_DIR, tenant_id)

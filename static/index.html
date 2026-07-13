@@ -234,8 +234,10 @@
             </div>
         </div>
         <div class="sidebar-footer">
-            <span class="status-dot connecting" id="statusDot"></span>
-            <span id="statusText" style="font-size:13px">Conectando...</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div><span class="status-dot connecting" id="statusDot"></span><span id="statusText" style="font-size:13px">Conectando...</span></div>
+                <a href="/logout" style="color:var(--danger);font-size:12px;text-decoration:none;font-weight:600">Sair</a>
+            </div>
         </div>
     </div>
     

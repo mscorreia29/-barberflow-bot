@@ -29,13 +29,16 @@ if (fs.existsSync(GROUPS_FILE)) {
 
 async function getBotResponse(phone, message, isGroup = false) {
     try {
+        console.log(`[Bridge] Chamando API para ${phone}: ${message.substring(0, 50)}`);
         const response = await fetch(`${BOT_API_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone, message, is_group: isGroup })
         });
+        console.log(`[Bridge] API respondeu: status=${response.status}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
+        console.log(`[Bridge] Resposta recebida: ${(data.response || '').substring(0, 80)}`);
         return data.response;
     } catch (error) {
         console.error('[Bridge] Erro ao comunicar com bot:', error.message);
@@ -63,7 +66,7 @@ async function connectToWhatsApp() {
 
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
-            console.log(`[Bridge] Connection: ${connection || 'none'}, qr: ${qr ? 'YES' : 'no'}`);
+            console.log(`[Bridge] Connection: ${connection || 'none'}, qr: ${qr ? 'YES' : 'no'}, lastDisconnect: ${lastDisconnect?.error?.message || 'none'}`);
 
             if (qr) {
                 console.log('[Bridge] QR CODE RECEBIDO!');
@@ -95,6 +98,7 @@ async function connectToWhatsApp() {
         sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('messages.upsert', async ({ messages, type }) => {
+            console.log(`[Bridge] messages.upsert: type=${type}, count=${messages.length}`);
             if (type !== 'notify') return;
 
             for (const msg of messages) {

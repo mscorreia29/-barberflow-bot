@@ -50,11 +50,13 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        .page-header { margin-bottom: 24px; }
+        .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; }
         .page-header h2 { font-size: 22px; font-weight: 700; }
         .page-header p { color: var(--text2); font-size: 14px; margin-top: 4px; }
+        .page-header .actions { display: flex; gap: 8px; }
         
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+        @media (max-width: 1200px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
         
         .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
@@ -64,13 +66,15 @@
         .stat-card .value.purple { color: var(--accent); }
         .stat-card .value.red { color: var(--danger); }
         .stat-card .value.yellow { color: var(--warning); }
+        .stat-card .sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
         
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .card-header h3 { font-size: 16px; font-weight: 600; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
         
         .qr-box { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; background: var(--bg3); border-radius: 12px; }
         .qr-box img { max-width: 260px; border-radius: 8px; }
@@ -92,6 +96,8 @@
         .btn-sm { padding: 6px 12px; font-size: 12px; }
         .btn-success { background: var(--success); color: #000; }
         .btn-success:hover { background: #00b894; }
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-warning:hover { background: #e09000; }
         
         .conversations-list { max-height: 500px; overflow-y: auto; }
         .conv-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
@@ -125,7 +131,7 @@
         .settings-group textarea { resize: vertical; min-height: 80px; }
         .settings-group .hint { font-size: 11px; color: var(--text2); margin-top: 4px; }
         
-        .chart-container { height: 250px; position: relative; }
+        .chart-container { height: 280px; position: relative; }
         
         .log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.6; max-height: 300px; overflow-y: auto; }
         .log-line { color: var(--text2); }
@@ -147,7 +153,30 @@
         .modal-overlay.open { display: flex; }
         .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
         .modal h3 { font-size: 18px; margin-bottom: 20px; }
+
+        .search-input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font-size: 14px; outline: none; margin-bottom: 16px; }
+        .search-input:focus { border-color: var(--primary); }
         
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: var(--accent); color: #fff; margin: 2px; }
+        .tag-remove { cursor: pointer; margin-left: 4px; opacity: 0.7; }
+        .tag-remove:hover { opacity: 1; }
+        .tag-input { display: flex; gap: 8px; }
+        .tag-input input { flex: 1; }
+        
+        .toggle { position: relative; width: 44px; height: 24px; background: var(--border); border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .toggle.on { background: var(--primary); }
+        .toggle .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: 0.2s; }
+        .toggle.on .knob { left: 22px; }
+        
+        .template-card { padding: 16px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.15s; }
+        .template-card:hover { border-color: var(--primary); background: var(--primary-dim); }
+        .template-card.selected { border-color: var(--primary); background: var(--primary-dim); }
+        .template-card .name { font-weight: 600; font-size: 14px; }
+        .template-card .preview { font-size: 12px; color: var(--text2); margin-top: 4px; max-height: 40px; overflow: hidden; }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--text2); }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -160,34 +189,48 @@
             <small>Painel de Controle</small>
         </div>
         <div class="sidebar-nav">
-            <div class="nav-item active" onclick="showPage('dashboard')">
+            <div class="nav-item active" onclick="showPage('dashboard', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                 Dashboard
             </div>
-            <div class="nav-item" onclick="showPage('conversations')">
+            <div class="nav-item" onclick="showPage('analytics', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                Analytics
+            </div>
+            <div class="nav-item" onclick="showPage('conversations', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 Conversas
             </div>
-            <div class="nav-item" onclick="showPage('send')">
+            <div class="nav-separator"></div>
+            <div class="nav-item" onclick="showPage('contacts', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Contatos
+            </div>
+            <div class="nav-item" onclick="showPage('send', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 Enviar Mensagem
             </div>
-            <div class="nav-item" onclick="showPage('test')">
+            <div class="nav-separator"></div>
+            <div class="nav-item" onclick="showPage('templates', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Templates
+            </div>
+            <div class="nav-item" onclick="showPage('campaigns', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                Campanhas
+            </div>
+            <div class="nav-item" onclick="showPage('notifications', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Notificacoes
+            </div>
+            <div class="nav-separator"></div>
+            <div class="nav-item" onclick="showPage('test', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                 Chat de Teste
             </div>
-            <div class="nav-item" onclick="showPage('settings')">
+            <div class="nav-item" onclick="showPage('settings', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Configuracoes
-            </div>
-            <div class="nav-separator"></div>
-            <div class="nav-item" onclick="showPage('campaigns')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                Campanhas
-            </div>
-            <div class="nav-item" onclick="showPage('notifications')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
-                Notificacoes
             </div>
         </div>
         <div class="sidebar-footer">
@@ -200,13 +243,16 @@
         <!-- DASHBOARD -->
         <div class="page active" id="page-dashboard">
             <div class="page-header">
-                <h2>Dashboard</h2>
-                <p>Visao geral do bot em tempo real</p>
+                <div>
+                    <h2>Dashboard</h2>
+                    <p>Visao geral do bot em tempo real</p>
+                </div>
             </div>
             <div class="stats-row">
                 <div class="stat-card"><div class="label">Total Conversas</div><div class="value green" id="statTotal">0</div></div>
                 <div class="stat-card"><div class="label">Ativas Agora</div><div class="value purple" id="statActive">0</div></div>
                 <div class="stat-card"><div class="label">Transferidas</div><div class="value yellow" id="statTransfer">0</div></div>
+                <div class="stat-card"><div class="label">Total Mensagens</div><div class="value" id="statMessages">0</div></div>
                 <div class="stat-card"><div class="label">Uptime</div><div class="value" id="statUptime">-</div></div>
             </div>
             <div class="grid-2">
@@ -222,7 +268,7 @@
                     <div class="info-row"><span class="label">IA</span><span>Groq Llama 3.3 70B</span></div>
                     <div class="info-row"><span class="label">Suporte</span><span>Seg-Sab 9h-19h</span></div>
                     <div class="info-row"><span class="label">WhatsApp</span><span>(47) 99675-9164</span></div>
-                    <div class="info-row"><span class="label">Plano</span><span style="color:var(--primary)">Gratuito</span></div>
+                    <div class="info-row"><span class="label">Contatos</span><span id="statContacts">0</span></div>
                     <div class="info-row"><span class="label">Deploy</span><span>Railway</span></div>
                     <div style="margin-top:16px"><a href="https://barber-flow.store" target="_blank" class="btn btn-primary">Acessar BarberFlow</a></div>
                 </div>
@@ -232,12 +278,46 @@
                 <div class="log-box" id="logBox"><div class="log-line"><span class="tag">[sistema]</span> Aguardando conexao...</div></div>
             </div>
         </div>
+
+        <!-- ANALYTICS -->
+        <div class="page" id="page-analytics">
+            <div class="page-header">
+                <div>
+                    <h2>Analytics</h2>
+                    <p> Metricas detalhadas do bot</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="loadAnalytics()">Atualizar</button>
+                </div>
+            </div>
+            <div class="stats-row" style="grid-template-columns: repeat(4,1fr)">
+                <div class="stat-card"><div class="label">Mensagens Hoje</div><div class="value green" id="analyticsToday">0</div></div>
+                <div class="stat-card"><div class="label">Tempo Resposta</div><div class="value purple" id="analyticsResponseTime">0s</div></div>
+                <div class="stat-card"><div class="label">Mensagens Totais</div><div class="value" id="analyticsTotal">0</div></div>
+                <div class="stat-card"><div class="label">Contatos</div><div class="value yellow" id="analyticsContacts">0</div></div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3>Mensagens por Dia</h3></div>
+                    <div class="chart-container"><canvas id="chartDaily"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Atividade por Hora</h3></div>
+                    <div class="chart-container"><canvas id="chartHourly"></canvas></div>
+                </div>
+            </div>
+        </div>
         
         <!-- CONVERSAS -->
         <div class="page" id="page-conversations">
             <div class="page-header">
-                <h2>Conversas</h2>
-                <p>Historico de todas as conversas do bot</p>
+                <div>
+                    <h2>Conversas</h2>
+                    <p>Historico de todas as conversas do bot</p>
+                </div>
+                <div class="actions">
+                    <input type="text" class="search-input" style="width:300px;margin:0" id="convSearch" placeholder="Buscar conversas..." oninput="filterConversations()">
+                </div>
             </div>
             <div class="grid-2">
                 <div class="card">
@@ -245,37 +325,139 @@
                     <div class="conversations-list" id="convList"></div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><h3>Detalhes da Conversa</h3><button class="btn btn-secondary" onclick="clearConvSelection()">Limpar</button></div>
+                    <div class="card-header"><h3>Detalhes da Conversa</h3><button class="btn btn-secondary btn-sm" onclick="clearConvSelection()">Limpar</button></div>
                     <div id="convDetail" style="color:var(--text2);text-align:center;padding:40px">Selecione uma conversa</div>
                 </div>
             </div>
         </div>
         
+        <!-- CONTATOS -->
+        <div class="page" id="page-contacts">
+            <div class="page-header">
+                <div>
+                    <h2>Contatos</h2>
+                    <p>Gerencie contatos, tags e segmentacao</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="exportContacts()">Exportar CSV</button>
+                    <button class="btn btn-primary" onclick="openModal('contactModal')">+ Novo Contato</button>
+                </div>
+            </div>
+            <div class="card">
+                <input type="text" class="search-input" id="contactSearch" placeholder="Buscar por nome ou telefone..." oninput="filterContacts()">
+                <table>
+                    <thead>
+                        <tr><th>Nome</th><th>Telefone</th><th>Tags</th><th>Ultima Msg</th><th>Acoes</th></tr>
+                    </thead>
+                    <tbody id="contactsTable"></tbody>
+                </table>
+                <div id="contactsEmpty" class="empty-state" style="display:none">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <p>Nenhum contato ainda</p>
+                </div>
+            </div>
+        </div>
+
         <!-- ENVIAR MENSAGEM -->
         <div class="page" id="page-send">
             <div class="page-header">
-                <h2>Enviar Mensagem</h2>
-                <p>Envie uma mensagem manualmente para qualquer numero</p>
+                <div>
+                    <h2>Enviar Mensagem</h2>
+                    <p>Envie uma mensagem manualmente para qualquer numero</p>
+                </div>
             </div>
-            <div class="card" style="max-width:600px">
-                <div class="settings-group">
-                    <label>Numero do WhatsApp (com DDD)</label>
-                    <input type="text" id="sendPhone" placeholder="Ex: 47999999999">
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="margin-bottom:16px">Enviar</h3>
+                    <div class="settings-group">
+                        <label>Numero do WhatsApp (com DDD)</label>
+                        <input type="text" id="sendPhone" placeholder="Ex: 47999999999">
+                    </div>
+                    <div class="settings-group">
+                        <label>Mensagem</label>
+                        <textarea id="sendMsg" placeholder="Digite sua mensagem..."></textarea>
+                    </div>
+                    <div class="settings-group">
+                        <label>Ou selecione um template</label>
+                        <div id="sendTemplateList" style="max-height:200px;overflow-y:auto"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="sendManual()">Enviar Mensagem</button>
+                    <div id="sendResult" style="margin-top:12px;font-size:13px"></div>
                 </div>
-                <div class="settings-group">
-                    <label>Mensagem</label>
-                    <textarea id="sendMsg" placeholder="Digite sua mensagem..."></textarea>
+                <div class="card">
+                    <h3 style="margin-bottom:16px">Historico de Envios</h3>
+                    <div id="sendHistory" style="max-height:400px;overflow-y:auto"></div>
                 </div>
-                <button class="btn btn-primary" onclick="sendManual()">Enviar Mensagem</button>
-                <div id="sendResult" style="margin-top:12px;font-size:13px"></div>
+            </div>
+        </div>
+
+        <!-- TEMPLATES -->
+        <div class="page" id="page-templates">
+            <div class="page-header">
+                <div>
+                    <h2>Templates</h2>
+                    <p>Gerencie templates de mensagem para reutilizacao</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="openModal('templateModal')">+ Novo Template</button>
+                </div>
+            </div>
+            <div class="grid-3" id="templatesGrid"></div>
+            <div id="templatesEmpty" class="empty-state" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                <p>Nenhum template criado</p>
+            </div>
+        </div>
+
+        <!-- CAMPANHAS -->
+        <div class="page" id="page-campaigns">
+            <div class="page-header">
+                <div>
+                    <h2>Campanhas</h2>
+                    <p>Gerencie campanhas de marketing</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="openModal('campModal')">+ Nova Campanha</button>
+                </div>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Nome</th><th>Mensagem</th><th>Destinatarios</th><th>Envio</th><th>Status</th><th>Acoes</th></tr>
+                    </thead>
+                    <tbody id="campaignsTable"></tbody>
+                </table>
+                <div id="campaignsEmpty" class="empty-state" style="display:none">Nenhuma campanha encontrada</div>
+            </div>
+        </div>
+
+        <!-- NOTIFICACOES -->
+        <div class="page" id="page-notifications">
+            <div class="page-header">
+                <div>
+                    <h2>Notificacoes</h2>
+                    <p>Visualize notificacoes pendentes e enviadas</p>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3>Pendentes</h3></div>
+                    <div id="pendingNotifications"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Enviadas</h3></div>
+                    <div id="sentNotifications"></div>
+                </div>
             </div>
         </div>
         
         <!-- CHAT DE TESTE -->
         <div class="page" id="page-test">
             <div class="page-header">
-                <h2>Chat de Teste</h2>
-                <p>Teste o bot digitando mensagens aqui</p>
+                <div>
+                    <h2>Chat de Teste</h2>
+                    <p>Teste o bot digitando mensagens aqui</p>
+                </div>
             </div>
             <div class="card" style="max-width:600px">
                 <div class="chat-area">
@@ -293,8 +475,10 @@
         <!-- CONFIGURACOES -->
         <div class="page" id="page-settings">
             <div class="page-header">
-                <h2>Configuracoes</h2>
-                <p>Configure o comportamento do bot</p>
+                <div>
+                    <h2>Configuracoes</h2>
+                    <p>Configure o comportamento do bot</p>
+                </div>
             </div>
             <div class="grid-2">
                 <div class="card">
@@ -315,52 +499,15 @@
                 </div>
                 <div class="card">
                     <div class="card-header"><h3>Sistema</h3></div>
-                    <div class="info-row"><span class="label">Versao</span><span>4.0.0</span></div>
+                    <div class="info-row"><span class="label">Versao</span><span>5.0.0</span></div>
                     <div class="info-row"><span class="label">Uptime</span><span id="cfgUptime">-</span></div>
                     <div class="info-row"><span class="label">Bridge PID</span><span id="cfgPid">-</span></div>
                     <div class="info-row"><span class="label">Modelo IA</span><span>Llama 3.3 70B</span></div>
-                    <div style="margin-top:16px">
+                    <div class="info-row"><span class="label">Armazenamento</span><span>JSON (ephemeral)</span></div>
+                    <div style="margin-top:16px;display:flex;gap:8px">
+                        <button class="btn btn-secondary" onclick="exportConversations()">Exportar Conversas</button>
                         <button class="btn btn-danger" onclick="if(confirm('Reiniciar o bot?'))fetch('/api/restart',{method:'POST'})">Reiniciar Bot</button>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CAMPANHAS -->
-        <div class="page" id="page-campaigns">
-            <div class="page-header">
-                <h2>Campanhas</h2>
-                <p>Gerencie campanhas de marketing</p>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3>Lista de Campanhas</h3>
-                    <button class="btn btn-primary" onclick="openModal('campModal')">+ Nova Campanha</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Nome</th><th>Mensagem</th><th>Destinatarios</th><th>Envio</th><th>Acoes</th></tr>
-                    </thead>
-                    <tbody id="campaignsTable"></tbody>
-                </table>
-                <div id="campaignsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhuma campanha encontrada</div>
-            </div>
-        </div>
-
-        <!-- NOTIFICACOES -->
-        <div class="page" id="page-notifications">
-            <div class="page-header">
-                <h2>Notificacoes</h2>
-                <p>Visualize notificacoes pendentes e enviadas</p>
-            </div>
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-header"><h3>Pendentes</h3></div>
-                    <div id="pendingNotifications"></div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><h3>Enviadas</h3></div>
-                    <div id="sentNotifications"></div>
                 </div>
             </div>
         </div>
@@ -393,20 +540,106 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal">
+            <h3 id="contactModalTitle">Novo Contato</h3>
+            <input type="hidden" id="editContactId">
+            <div class="form-row">
+                <div class="settings-group">
+                    <label>Nome</label>
+                    <input type="text" id="contactName" placeholder="Nome do contato">
+                </div>
+                <div class="settings-group">
+                    <label>Telefone</label>
+                    <input type="text" id="contactPhone" placeholder="47999999999">
+                </div>
+            </div>
+            <div class="settings-group">
+                <label>Tags (uma por linha)</label>
+                <textarea id="contactTags" placeholder="cliente&#10;vip&#10;barbeiro"></textarea>
+            </div>
+            <div class="settings-group">
+                <label>Notas</label>
+                <textarea id="contactNotes" placeholder="Notas sobre o contato..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('contactModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveContact()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal">
+            <h3>Novo Template</h3>
+            <div class="settings-group">
+                <label>Nome do Template</label>
+                <input type="text" id="templateName" placeholder="Ex: Boas-vindas">
+            </div>
+            <div class="settings-group">
+                <label>Categoria</label>
+                <select id="templateCategory">
+                    <option value="geral">Geral</option>
+                    <option value="suporte">Suporte</option>
+                    <option value="vendas">Vendas</option>
+                    <option value="marketing">Marketing</option>
+                </select>
+            </div>
+            <div class="settings-group">
+                <label>Conteudo</label>
+                <textarea id="templateContent" placeholder="Digite o conteudo do template..." style="min-height:120px"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('templateModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createTemplate()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="tagModal">
+        <div class="modal">
+            <h3>Gerenciar Tags</h3>
+            <div id="tagModalTags" style="margin-bottom:12px"></div>
+            <div class="tag-input">
+                <input type="text" id="newTagInput" placeholder="Nova tag...">
+                <button class="btn btn-primary btn-sm" onclick="addTagToContact()">Adicionar</button>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('tagModal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API = '';
         let startTime = null;
         let selectedConv = null;
+        let allConversations = {};
+        let allContacts = [];
+        let editingContactId = null;
+        let tagModalContactId = null;
+        let dailyChart = null, hourlyChart = null;
         
-        function showPage(name) {
+        function showPage(name, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('page-' + name).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if (el) el.classList.add('active');
+            if (name === 'analytics') loadAnalytics();
+            if (name === 'contacts') loadContacts();
+            if (name === 'templates') loadTemplates();
             if (name === 'campaigns') loadCampaigns();
             if (name === 'notifications') loadNotifications();
+            if (name === 'send') loadSendTemplates();
         }
         
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+        });
+
+        // === STATUS ===
         async function checkStatus() {
             try {
                 const res = await fetch(`${API}/health`);
@@ -418,15 +651,16 @@
                     text.textContent = 'Online';
                     if (!startTime) startTime = Date.now();
                 } else {
-                    dot.className = 'status-dot offline';
-                    text.textContent = 'Desconectado';
+                    dot.className = 'status-dot connecting';
+                    text.textContent = 'Conectando...';
                 }
             } catch (e) {
                 document.getElementById('statusDot').className = 'status-dot offline';
                 document.getElementById('statusText').textContent = 'Erro';
             }
         }
-        
+
+        // === QR ===
         async function loadQR() {
             const box = document.getElementById('qrBox');
             try {
@@ -441,7 +675,8 @@
                 box.innerHTML = '<div class="loading">Erro ao carregar QR</div>';
             }
         }
-        
+
+        // === STATS ===
         async function loadStats() {
             try {
                 const res = await fetch(`${API}/stats`);
@@ -449,6 +684,9 @@
                 document.getElementById('statTotal').textContent = data.total_conversations || 0;
                 document.getElementById('statActive').textContent = data.active_conversations || 0;
                 document.getElementById('statTransfer').textContent = data.transferred_users || 0;
+                document.getElementById('statMessages').textContent = data.analytics?.total_messages || 0;
+                document.getElementById('statContacts').textContent = data.total_contacts || 0;
+                document.getElementById('analyticsContacts').textContent = data.total_contacts || 0;
                 
                 if (startTime) {
                     const diff = Math.floor((Date.now() - startTime) / 1000);
@@ -459,9 +697,7 @@
                     document.getElementById('cfgUptime').textContent = uptime;
                 }
                 
-                if (data.bridge && data.bridge.pid) {
-                    document.getElementById('cfgPid').textContent = data.bridge.pid;
-                }
+                if (data.bridge?.pid) document.getElementById('cfgPid').textContent = data.bridge.pid;
                 
                 if (data.bridge_log) {
                     const logBox = document.getElementById('logBox');
@@ -471,106 +707,351 @@
                 }
                 
                 if (data.conversations) {
+                    allConversations = data.conversations;
                     loadConversationsList(data.conversations);
                 }
             } catch (e) {}
         }
-        
+
+        // === CONVERSATIONS ===
         function loadConversationsList(convs) {
             const list = document.getElementById('convList');
-            document.getElementById('convCount').textContent = Object.keys(convs).length;
+            const phones = Object.keys(convs);
+            document.getElementById('convCount').textContent = phones.length;
             
-            const phones = Object.keys(convs).sort((a, b) => {
-                const aLast = convs[a].length ? convs[a][convs[a].length-1] : {};
-                const bLast = convs[b].length ? convs[b][convs[b].length-1] : {};
+            const sorted = phones.sort((a, b) => {
+                const aLast = convs[a]?.length ? convs[a][convs[a].length-1] : {};
+                const bLast = convs[b]?.length ? convs[b][convs[b].length-1] : {};
                 return 0;
             });
             
-            list.innerHTML = phones.map(phone => {
+            list.innerHTML = sorted.map(phone => {
                 const msgs = convs[phone];
-                const lastMsg = msgs.length ? msgs[msgs.length - 1] : null;
+                const lastMsg = msgs?.length ? msgs[msgs.length - 1] : null;
                 const preview = lastMsg ? lastMsg.content.substring(0, 40) : 'Sem mensagens';
                 const initial = phone.substring(phone.length - 4);
+                const contact = allContacts.find(c => c.phone === phone);
+                const name = contact?.name || phone;
                 return `<div class="conv-item ${selectedConv === phone ? 'active' : ''}" onclick="selectConv('${phone}')">
                     <div class="conv-avatar">${initial}</div>
                     <div class="conv-info">
-                        <div class="conv-name">${phone}</div>
+                        <div class="conv-name">${name}</div>
                         <div class="conv-preview">${preview}</div>
                     </div>
                 </div>`;
             }).join('');
         }
-        
+
+        function filterConversations() {
+            const q = document.getElementById('convSearch').value.toLowerCase();
+            const filtered = {};
+            for (const [phone, msgs] of Object.entries(allConversations)) {
+                const contact = allContacts.find(c => c.phone === phone);
+                if (phone.includes(q) || contact?.name?.toLowerCase().includes(q) || msgs.some(m => m.content.toLowerCase().includes(q))) {
+                    filtered[phone] = msgs;
+                }
+            }
+            loadConversationsList(filtered);
+        }
+
         async function selectConv(phone) {
             selectedConv = phone;
             const detail = document.getElementById('convDetail');
             try {
                 const res = await fetch(`${API}/conversations/${phone}`);
                 const msgs = await res.json();
-                detail.innerHTML = `<div style="max-height:400px;overflow-y:auto">${msgs.map(m => 
-                    `<div class="chat-bubble ${m.role === 'user' ? 'user' : 'bot'}">${m.content}</div>`
-                ).join('')}</div>`;
+                const contact = allContacts.find(c => c.phone === phone);
+                const name = contact?.name || phone;
+                detail.innerHTML = `
+                    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+                        <strong>${name}</strong>
+                        <button class="btn btn-sm btn-secondary" onclick="openTagModalForContact('${phone}')">Tags</button>
+                    </div>
+                    <div style="max-height:400px;overflow-y:auto">${msgs.map(m => 
+                        `<div class="chat-bubble ${m.role === 'user' ? 'user' : 'bot'}">${m.content}</div>`
+                    ).join('')}</div>`;
             } catch (e) {
                 detail.innerHTML = '<div style="color:var(--danger);text-align:center;padding:20px">Erro ao carregar</div>';
             }
         }
-        
+
         function clearConvSelection() {
             selectedConv = null;
             document.getElementById('convDetail').innerHTML = '<div style="color:var(--text2);text-align:center;padding:40px">Selecione uma conversa</div>';
             document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
         }
-        
+
+        // === ANALYTICS ===
+        async function loadAnalytics() {
+            try {
+                const res = await fetch(`${API}/stats`);
+                const data = await res.json();
+                const a = data.analytics || {};
+                document.getElementById('analyticsToday').textContent = (a.daily && a.daily[Object.keys(a.daily).pop()]) ? Object.values(a.daily[Object.keys(a.daily).pop()]).reduce((s,v)=>s+v,0) : 0;
+                document.getElementById('analyticsResponseTime').textContent = (a.avg_response_time || 0) + 's';
+                document.getElementById('analyticsTotal').textContent = a.total_messages || 0;
+
+                if (a.daily) {
+                    const labels = Object.keys(a.daily);
+                    const sent = labels.map(d => a.daily[d].sent || 0);
+                    const received = labels.map(d => a.daily[d].received || 0);
+                    const ctx1 = document.getElementById('chartDaily').getContext('2d');
+                    if (dailyChart) dailyChart.destroy();
+                    dailyChart = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: labels.map(d => d.substring(5)),
+                            datasets: [
+                                { label: 'Enviadas', data: sent, backgroundColor: '#00d4aa88', borderColor: '#00d4aa', borderWidth: 1 },
+                                { label: 'Recebidas', data: received, backgroundColor: '#6c5ce788', borderColor: '#6c5ce7', borderWidth: 1 }
+                            ]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#8892a4' } } },
+                            scales: {
+                                x: { ticks: { color: '#8892a4' }, grid: { color: '#252d3d' } },
+                                y: { ticks: { color: '#8892a4' }, grid: { color: '#252d3d' } }
+                            }
+                        }
+                    });
+                }
+
+                if (a.hourly) {
+                    const labels = Object.keys(a.hourly).sort();
+                    const values = labels.map(h => a.hourly[h]);
+                    const ctx2 = document.getElementById('chartHourly').getContext('2d');
+                    if (hourlyChart) hourlyChart.destroy();
+                    hourlyChart = new Chart(ctx2, {
+                        type: 'line',
+                        data: {
+                            labels: labels.map(h => h + 'h'),
+                            datasets: [{ label: 'Mensagens', data: values, borderColor: '#00d4aa', backgroundColor: '#00d4aa22', fill: true, tension: 0.3 }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#8892a4' } } },
+                            scales: {
+                                x: { ticks: { color: '#8892a4' }, grid: { color: '#252d3d' } },
+                                y: { ticks: { color: '#8892a4' }, grid: { color: '#252d3d' } }
+                            }
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        // === CONTACTS ===
+        async function loadContacts() {
+            try {
+                const res = await fetch(`${API}/api/contacts`);
+                allContacts = await res.json();
+                renderContacts(allContacts);
+            } catch (e) {}
+        }
+
+        function renderContacts(items) {
+            const tbody = document.getElementById('contactsTable');
+            const empty = document.getElementById('contactsEmpty');
+            if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+            tbody.innerHTML = items.map(c => {
+                const tags = (c.tags || []).map(t => `<span class="tag">${t} <span class="tag-remove" onclick="event.stopPropagation();removeTag(${c.id},'${t}')">&times;</span></span>`).join('');
+                const lastMsg = c.last_message ? new Date(c.last_message).toLocaleString('pt-BR') : '-';
+                return `<tr style="cursor:pointer" onclick="editContact(${c.id})">
+                    <td><strong>${c.name || '-'}</strong></td>
+                    <td>${c.phone}</td>
+                    <td>${tags || '-'}</td>
+                    <td style="font-size:12px;color:var(--text2)">${lastMsg}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();openTagModal(${c.id})">Tags</button>
+                        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteContact(${c.id})">Excluir</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterContacts() {
+            const q = document.getElementById('contactSearch').value.toLowerCase();
+            const filtered = allContacts.filter(c => c.name?.toLowerCase().includes(q) || c.phone.includes(q) || (c.tags||[]).some(t => t.includes(q)));
+            renderContacts(filtered);
+        }
+
+        function editContact(id) {
+            const c = allContacts.find(x => x.id === id);
+            if (!c) return;
+            editingContactId = id;
+            document.getElementById('contactModalTitle').textContent = 'Editar Contato';
+            document.getElementById('contactName').value = c.name || '';
+            document.getElementById('contactPhone').value = c.phone || '';
+            document.getElementById('contactTags').value = (c.tags || []).join('\n');
+            document.getElementById('contactNotes').value = c.notes || '';
+            openModal('contactModal');
+        }
+
+        async function saveContact() {
+            const body = {
+                name: document.getElementById('contactName').value.trim(),
+                phone: document.getElementById('contactPhone').value.trim(),
+                tags: document.getElementById('contactTags').value.split('\n').map(t => t.trim()).filter(Boolean),
+                notes: document.getElementById('contactNotes').value.trim()
+            };
+            if (!body.phone) { alert('Telefone obrigatorio'); return; }
+            try {
+                if (editingContactId) {
+                    await fetch(`${API}/api/contacts/${editingContactId}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                } else {
+                    await fetch(`${API}/api/contacts`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                }
+                closeModal('contactModal');
+                editingContactId = null;
+                document.getElementById('contactModalTitle').textContent = 'Novo Contato';
+                ['contactName','contactPhone','contactTags','contactNotes'].forEach(id => document.getElementById(id).value = '');
+                loadContacts();
+            } catch (e) { alert('Erro ao salvar'); }
+        }
+
+        async function deleteContact(id) {
+            if (!confirm('Excluir este contato?')) return;
+            await fetch(`${API}/api/contacts/${id}`, { method: 'DELETE' });
+            loadContacts();
+        }
+
+        function openTagModal(contactId) {
+            tagModalContactId = contactId;
+            const c = allContacts.find(x => x.id === contactId);
+            const tagsDiv = document.getElementById('tagModalTags');
+            tagsDiv.innerHTML = (c?.tags || []).map(t => `<span class="tag">${t} <span class="tag-remove" onclick="removeTagFromModal(${contactId},'${t}')">&times;</span></span>`).join('') || '<span style="color:var(--text2);font-size:13px">Nenhuma tag</span>';
+            openModal('tagModal');
+        }
+
+        function openTagModalForContact(phone) {
+            const c = allContacts.find(x => x.phone === phone);
+            if (c) openTagModal(c.id);
+        }
+
+        async function removeTagFromModal(contactId, tag) {
+            await fetch(`${API}/api/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
+            await loadContacts();
+            openTagModal(contactId);
+        }
+
+        async function removeTag(contactId, tag) {
+            await fetch(`${API}/api/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
+            loadContacts();
+        }
+
+        async function addTagToContact() {
+            const tag = document.getElementById('newTagInput').value.trim();
+            if (!tag) return;
+            await fetch(`${API}/api/contacts/${tagModalContactId}/tags`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ tag }) });
+            document.getElementById('newTagInput').value = '';
+            await loadContacts();
+            openTagModal(tagModalContactId);
+        }
+
+        function exportContacts() { window.location.href = `${API}/api/export/contacts`; }
+        function exportConversations() { window.location.href = `${API}/api/export/conversations`; }
+
+        // === TEMPLATES ===
+        async function loadTemplates() {
+            try {
+                const res = await fetch(`${API}/api/templates`);
+                const items = await res.json();
+                const grid = document.getElementById('templatesGrid');
+                const empty = document.getElementById('templatesEmpty');
+                if (!items.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                grid.innerHTML = items.map(t => `
+                    <div class="template-card" onclick="useTemplate('${t.content.replace(/'/g, "\\'")}')">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <div class="name">${t.name}</div>
+                            <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteTemplate(${t.id})">Excluir</button>
+                        </div>
+                        <span class="badge badge-info" style="margin-top:4px">${t.category}</span>
+                        <div class="preview">${t.content}</div>
+                    </div>
+                `).join('');
+            } catch (e) {}
+        }
+
+        async function createTemplate() {
+            const body = {
+                name: document.getElementById('templateName').value.trim(),
+                content: document.getElementById('templateContent').value.trim(),
+                category: document.getElementById('templateCategory').value
+            };
+            if (!body.name || !body.content) { alert('Preencha nome e conteudo'); return; }
+            await fetch(`${API}/api/templates`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            closeModal('templateModal');
+            ['templateName','templateContent'].forEach(id => document.getElementById(id).value = '');
+            loadTemplates();
+        }
+
+        async function deleteTemplate(id) {
+            if (!confirm('Excluir este template?')) return;
+            await fetch(`${API}/api/templates/${id}`, { method: 'DELETE' });
+            loadTemplates();
+        }
+
+        function useTemplate(content) {
+            document.getElementById('sendMsg').value = content;
+            showPage('send', document.querySelectorAll('.nav-item')[5]);
+        }
+
+        async function loadSendTemplates() {
+            try {
+                const res = await fetch(`${API}/api/templates`);
+                const items = await res.json();
+                const div = document.getElementById('sendTemplateList');
+                div.innerHTML = items.map(t => `
+                    <div class="template-card" onclick="document.getElementById('sendMsg').value='${t.content.replace(/'/g, "\\'")}'">
+                        <div class="name">${t.name} <span class="badge badge-info">${t.category}</span></div>
+                        <div class="preview">${t.content}</div>
+                    </div>
+                `).join('') || '<div style="color:var(--text2);font-size:13px;padding:8px">Nenhum template criado</div>';
+            } catch (e) {}
+        }
+
+        // === SEND ===
         async function sendManual() {
             const phone = document.getElementById('sendPhone').value.trim();
             const msg = document.getElementById('sendMsg').value.trim();
             const result = document.getElementById('sendResult');
             if (!phone || !msg) { result.innerHTML = '<span style="color:var(--danger)">Preencha todos os campos</span>'; return; }
             try {
-                const res = await fetch(`${API}/send`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, message: msg}) });
+                const res = await fetch(`${API}/api/send`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, message: msg}) });
                 const data = await res.json();
-                result.innerHTML = data.ok ? '<span style="color:var(--success)">Mensagem enviada!</span>' : `<span style="color:var(--danger)">${data.error}</span>`;
+                result.innerHTML = data.ok ? '<span style="color:var(--success)">Mensagem enviada!</span>' : `<span style="color:var(--danger)">${data.error || 'Erro'}</span>`;
                 document.getElementById('sendMsg').value = '';
             } catch (e) {
                 result.innerHTML = '<span style="color:var(--danger)">Erro ao enviar</span>';
             }
         }
-        
+
+        // === TEST ===
         async function sendTest() {
             const input = document.getElementById('testInput');
             const msg = input.value.trim();
             if (!msg) return;
             const chat = document.getElementById('testChat');
             const time = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-            
             chat.innerHTML += `<div class="chat-bubble user">${msg}<div class="time">${time}</div></div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
-            
             try {
                 const res = await fetch(`${API}/chat`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone: 'test_user', message: msg}) });
                 const data = await res.json();
-                const response = data.response || 'Erro ao processar';
-                chat.innerHTML += `<div class="chat-bubble bot">${response}<div class="time">${time}</div></div>`;
+                chat.innerHTML += `<div class="chat-bubble bot">${data.response || 'Erro'}<div class="time">${time}</div></div>`;
             } catch (e) {
                 chat.innerHTML += `<div class="chat-bubble bot">Erro de conexao<div class="time">${time}</div></div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
-        
-        function saveSettings() {
-            alert('Configuracoes salvas! (Em breve sera persistente)');
-        }
 
-        // --- MODALS ---
-        function openModal(id) {
-            document.getElementById(id).classList.add('open');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
+        function saveSettings() { alert('Configuracoes salvas! (Em breve sera persistente)'); }
 
-        // --- CAMPAIGNS ---
+        // === CAMPAIGNS ===
         async function loadCampaigns() {
             try {
                 const res = await fetch(`${API}/api/campaigns`);
@@ -583,11 +1064,13 @@
                 tbody.innerHTML = items.map(c => {
                     const recipients = Array.isArray(c.recipients) ? c.recipients.length : (c.recipients ? String(c.recipients).split(',').length : 0);
                     const sendStr = c.send_at ? new Date(c.send_at).toLocaleString('pt-BR') : '-';
+                    const status = c.sent ? '<span class="badge badge-success">Enviada</span>' : '<span class="badge badge-warning">Pendente</span>';
                     return `<tr>
                         <td>${c.name || '-'}</td>
                         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.message || '-'}</td>
                         <td>${recipients}</td>
                         <td>${sendStr}</td>
+                        <td>${status}</td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteCampaign('${c.id}')">Excluir</button></td>
                     </tr>`;
                 }).join('');
@@ -597,21 +1080,17 @@
         }
 
         async function createCampaign() {
-            const recipientsRaw = document.getElementById('campRecipients').value.trim();
-            const recipients = recipientsRaw ? recipientsRaw.split('\n').map(r => r.trim()).filter(Boolean) : [];
             const body = {
                 name: document.getElementById('campName').value.trim(),
                 message: document.getElementById('campMessage').value.trim(),
-                recipients,
+                recipients: document.getElementById('campRecipients').value.trim().split('\n').map(r => r.trim()).filter(Boolean),
                 send_at: document.getElementById('campSendAt').value
             };
             if (!body.name || !body.message) { alert('Preencha nome e mensagem'); return; }
-            try {
-                await fetch(`${API}/api/campaigns`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-                closeModal('campModal');
-                loadCampaigns();
-                ['campName','campMessage','campRecipients','campSendAt'].forEach(id => document.getElementById(id).value = '');
-            } catch (e) { alert('Erro ao criar campanha'); }
+            await fetch(`${API}/api/campaigns`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            closeModal('campModal');
+            loadCampaigns();
+            ['campName','campMessage','campRecipients','campSendAt'].forEach(id => document.getElementById(id).value = '');
         }
 
         async function deleteCampaign(id) {
@@ -620,7 +1099,7 @@
             loadCampaigns();
         }
 
-        // --- NOTIFICATIONS ---
+        // === NOTIFICATIONS ===
         async function loadNotifications() {
             const pendingDiv = document.getElementById('pendingNotifications');
             const sentDiv = document.getElementById('sentNotifications');
@@ -653,6 +1132,7 @@
             }
         }
         
+        // === INIT ===
         checkStatus();
         loadQR();
         loadStats();

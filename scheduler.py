@@ -1,4 +1,4 @@
-# Scheduler - Sistema de notificacoes e agendamentos
+# Scheduler - Notificacoes e Campanhas
 import threading
 import time
 import json
@@ -8,9 +8,7 @@ from datetime import datetime, timedelta
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
-SUBSCRIPTIONS_FILE = os.path.join(DATA_DIR, "subscriptions.json")
 NOTIFICATIONS_FILE = os.path.join(DATA_DIR, "notifications.json")
-SCHEDULE_FILE = os.path.join(DATA_DIR, "schedule.json")
 CAMPAIGNS_FILE = os.path.join(DATA_DIR, "campaigns.json")
 
 def load_json(path, default=None):
@@ -54,62 +52,11 @@ class NotificationManager:
     def _loop(self):
         while self.running:
             try:
-                self._check_subscriptions()
-                self._check_schedule()
                 self._check_campaigns()
                 self._send_pending()
             except Exception as e:
                 print(f"[Scheduler] Erro: {e}", flush=True)
             time.sleep(60)
-    
-    def _check_subscriptions(self):
-        subs = load_json(SUBSCRIPTIONS_FILE, [])
-        now = datetime.now()
-        
-        for sub in subs:
-            if sub.get("notified"):
-                continue
-            
-            end_date = datetime.fromisoformat(sub["end_date"])
-            days_left = (end_date - now).days
-            
-            if days_left <= 0:
-                msg = f"Olá {sub.get('name', '')}! Sua assinatura do BarberFlow ({sub.get('plan', '')}) expirou. Acesse barber-flow.store/auth para renovar."
-                self._queue_notification(sub["phone"], msg, "expired")
-                sub["notified"] = True
-                sub["status"] = "expired"
-            elif days_left <= 3:
-                msg = f"Olá {sub.get('name', '')}! Sua assinatura do BarberFlow expira em {days_left} dia(s). Plano: {sub.get('plan', '')} - R$ {sub.get('price', '')}. Renove em barber-flow.store/auth"
-                self._queue_notification(sub["phone"], msg, "reminder_3d")
-                sub["notified"] = True
-            elif days_left <= 7:
-                msg = f"Olá {sub.get('name', '')}! Sua assinatura do BarberFlow expira em {days_left} dias. Plano: {sub.get('plan', '')} - R$ {sub.get('price', '')}."
-                self._queue_notification(sub["phone"], msg, "reminder_7d")
-                sub["notified"] = True
-        
-        save_json(SUBSCRIPTIONS_FILE, subs)
-    
-    def _check_schedule(self):
-        schedule = load_json(SCHEDULE_FILE, [])
-        now = datetime.now()
-        
-        for appt in schedule:
-            if appt.get("notified"):
-                continue
-            
-            appt_time = datetime.fromisoformat(appt["datetime"])
-            diff = (appt_time - now).total_seconds() / 60
-            
-            if diff <= 0 and not appt.get("notified"):
-                msg = f"Olá {appt.get('client_name', '')}! Lembrete: seu horário na {appt.get('barbershop', '')} é HOJE às {appt_time.strftime('%H:%M')}. Confirme respondendo SIM."
-                self._queue_notification(appt["phone"], msg, "appointment")
-                appt["notified"] = True
-            elif 55 <= diff <= 65:
-                msg = f"Olá {appt.get('client_name', '')}! Seu horário na {appt.get('barbershop', '')} é amanhã às {appt_time.strftime('%H:%M')}. Confirme respondendo SIM."
-                self._queue_notification(appt["phone"], msg, "tomorrow")
-                appt["notified"] = True
-        
-        save_json(SCHEDULE_FILE, schedule)
     
     def _check_campaigns(self):
         campaigns = load_json(CAMPAIGNS_FILE, [])
@@ -160,83 +107,9 @@ class NotificationManager:
     def get_sent(self):
         notifs = load_json(NOTIFICATIONS_FILE, [])
         return [n for n in notifs if n.get("sent")]
-
-
-class SubscriptionManager:
-    def add(self, phone, name, plan, price, end_date):
-        subs = load_json(SUBSCRIPTIONS_FILE, [])
-        sub = {
-            "id": len(subs) + 1,
-            "phone": phone,
-            "name": name,
-            "plan": plan,
-            "price": price,
-            "end_date": end_date,
-            "status": "active",
-            "notified": False,
-            "created_at": datetime.now().isoformat()
-        }
-        subs.append(sub)
-        save_json(SUBSCRIPTIONS_FILE, subs)
-        return sub
     
-    def get_all(self):
-        return load_json(SUBSCRIPTIONS_FILE, [])
-    
-    def get_active(self):
-        subs = self.get_all()
-        return [s for s in subs if s.get("status") == "active"]
-    
-    def update_status(self, sub_id, status):
-        subs = self.get_all()
-        for s in subs:
-            if s["id"] == sub_id:
-                s["status"] = status
-                if status == "paid":
-                    s["notified"] = False
-                    s["end_date"] = (datetime.now() + timedelta(days=30)).isoformat()
-                break
-        save_json(SUBSCRIPTIONS_FILE, subs)
-    
-    def delete(self, sub_id):
-        subs = self.get_all()
-        subs = [s for s in subs if s["id"] != sub_id]
-        save_json(SUBSCRIPTIONS_FILE, subs)
-
-
-class ScheduleManager:
-    def add(self, phone, client_name, barbershop, datetime_str, service=""):
-        schedule = load_json(SCHEDULE_FILE, [])
-        appt = {
-            "id": len(schedule) + 1,
-            "phone": phone,
-            "client_name": client_name,
-            "barbershop": barbershop,
-            "datetime": datetime_str,
-            "service": service,
-            "status": "confirmed",
-            "notified": False,
-            "created_at": datetime.now().isoformat()
-        }
-        schedule.append(appt)
-        save_json(SCHEDULE_FILE, schedule)
-        return appt
-    
-    def get_all(self):
-        return load_json(SCHEDULE_FILE, [])
-    
-    def get_by_date(self, date_str):
-        schedule = self.get_all()
-        return [s for s in schedule if s["datetime"].startswith(date_str)]
-    
-    def get_by_phone(self, phone):
-        schedule = self.get_all()
-        return [s for s in schedule if s["phone"] == phone]
-    
-    def cancel(self, appt_id):
-        schedule = self.get_all()
-        schedule = [s for s in schedule if s["id"] != appt_id]
-        save_json(SCHEDULE_FILE, schedule)
+    def queue(self, phone, message, type="manual"):
+        self._queue_notification(phone, message, type)
 
 
 class CampaignManager:
@@ -252,7 +125,7 @@ class CampaignManager:
             "created_at": datetime.now().isoformat()
         }
         campaigns.append(camp)
-        save_json(CAMPAIGNS_FILE, camp)
+        save_json(CAMPAIGNS_FILE, campaigns)
         return camp
     
     def get_all(self):
@@ -265,6 +138,4 @@ class CampaignManager:
 
 
 scheduler = NotificationManager()
-subscriptions = SubscriptionManager()
-schedule_mgr = ScheduleManager()
 campaigns = CampaignManager()

@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from bot import bot
 from config import BOT_NAME
-from scheduler import scheduler, subscriptions, schedule_mgr, campaigns
+from scheduler import scheduler, campaigns
 
 app = Flask(__name__, static_folder='static')
 
@@ -94,9 +94,7 @@ def stats():
     s["conversations"] = {}
     for phone, msgs in bot.conversations.items():
         s["conversations"][phone] = [{"role": m["role"], "content": m["content"]} for m in msgs]
-    s["subscriptions"] = subscriptions.get_active()
     s["pending_notifications"] = scheduler.get_pending()
-    s["appointments"] = schedule_mgr.get_all()
     s["campaigns"] = campaigns.get_all()
     try:
         with open("/app/bridge.log") as f:
@@ -111,58 +109,17 @@ def get_conversation(phone):
         return jsonify(bot.conversations[phone])
     return jsonify([])
 
-@app.route('/send', methods=['POST'])
-def send_message():
-    return jsonify({"error": "Envio manual ainda nao implementado"}), 501
-
-# === SUBSCRIPTIONS ===
-@app.route('/api/subscriptions', methods=['GET'])
-def get_subscriptions():
-    return jsonify(subscriptions.get_all())
-
-@app.route('/api/subscriptions', methods=['POST'])
-def add_subscription():
+# === SEND ===
+@app.route('/api/send', methods=['POST'])
+def api_send():
     data = request.get_json()
-    sub = subscriptions.add(
-        phone=data["phone"],
-        name=data.get("name", ""),
-        plan=data.get("plan", "Basico"),
-        price=data.get("price", "49.90"),
-        end_date=data["end_date"]
-    )
-    return jsonify(sub)
-
-@app.route('/api/subscriptions/<int:sub_id>/pay', methods=['POST'])
-def pay_subscription(sub_id):
-    subscriptions.update_status(sub_id, "paid")
-    return jsonify({"ok": True})
-
-@app.route('/api/subscriptions/<int:sub_id>', methods=['DELETE'])
-def delete_subscription(sub_id):
-    subscriptions.delete(sub_id)
-    return jsonify({"ok": True})
-
-# === APPOINTMENTS ===
-@app.route('/api/appointments', methods=['GET'])
-def get_appointments():
-    return jsonify(schedule_mgr.get_all())
-
-@app.route('/api/appointments', methods=['POST'])
-def add_appointment():
-    data = request.get_json()
-    appt = schedule_mgr.add(
-        phone=data["phone"],
-        client_name=data.get("client_name", ""),
-        barbershop=data.get("barbershop", ""),
-        datetime_str=data["datetime"],
-        service=data.get("service", "")
-    )
-    return jsonify(appt)
-
-@app.route('/api/appointments/<int:appt_id>', methods=['DELETE'])
-def delete_appointment(appt_id):
-    schedule_mgr.cancel(appt_id)
-    return jsonify({"ok": True})
+    phone = data.get("phone", "")
+    message = data.get("message", "")
+    if not phone or not message:
+        return jsonify({"error": "phone e message obrigatorios"}), 400
+    success = bridge_send(phone, message)
+    scheduler.queue(phone, message, "manual")
+    return jsonify({"ok": success})
 
 # === CAMPAIGNS ===
 @app.route('/api/campaigns', methods=['GET'])
@@ -193,16 +150,6 @@ def get_pending():
 @app.route('/api/notifications/sent', methods=['GET'])
 def get_sent():
     return jsonify(scheduler.get_sent())
-
-@app.route('/api/send', methods=['POST'])
-def api_send():
-    data = request.get_json()
-    phone = data.get("phone", "")
-    message = data.get("message", "")
-    if not phone or not message:
-        return jsonify({"error": "phone e message obrigatorios"}), 400
-    success = bridge_send(phone, message)
-    return jsonify({"ok": success})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

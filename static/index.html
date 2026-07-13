@@ -181,14 +181,6 @@
                 Configuracoes
             </div>
             <div class="nav-separator"></div>
-            <div class="nav-item" onclick="showPage('subscriptions')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                Assinaturas
-            </div>
-            <div class="nav-item" onclick="showPage('appointments')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Agenda
-            </div>
             <div class="nav-item" onclick="showPage('campaigns')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Campanhas
@@ -334,48 +326,6 @@
             </div>
         </div>
 
-        <!-- ASSINATURAS -->
-        <div class="page" id="page-subscriptions">
-            <div class="page-header">
-                <h2>Assinaturas</h2>
-                <p>Gerencie assinaturas dos clientes</p>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3>Lista de Assinaturas</h3>
-                    <button class="btn btn-primary" onclick="openModal('subModal')">+ Nova Assinatura</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Nome</th><th>Telefone</th><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Acoes</th></tr>
-                    </thead>
-                    <tbody id="subscriptionsTable"></tbody>
-                </table>
-                <div id="subscriptionsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhuma assinatura encontrada</div>
-            </div>
-        </div>
-
-        <!-- AGENDA -->
-        <div class="page" id="page-appointments">
-            <div class="page-header">
-                <h2>Agenda</h2>
-                <p>Gerencie agendamentos dos clientes</p>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3>Lista de Agendamentos</h3>
-                    <button class="btn btn-primary" onclick="openModal('aptModal')">+ Novo Agendamento</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Cliente</th><th>Telefone</th><th>Data/Hora</th><th>Barbeiro</th><th>Servico</th><th>Status</th><th>Acoes</th></tr>
-                    </thead>
-                    <tbody id="appointmentsTable"></tbody>
-                </table>
-                <div id="appointmentsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum agendamento encontrado</div>
-            </div>
-        </div>
-
         <!-- CAMPANHAS -->
         <div class="page" id="page-campaigns">
             <div class="page-header">
@@ -417,81 +367,6 @@
     </div>
 
     <!-- MODALS -->
-    <div class="modal-overlay" id="subModal">
-        <div class="modal">
-            <h3>Nova Assinatura</h3>
-            <div class="settings-group">
-                <label>Telefone</label>
-                <input type="text" id="subPhone" placeholder="Ex: 47999999999">
-            </div>
-            <div class="settings-group">
-                <label>Nome</label>
-                <input type="text" id="subName" placeholder="Nome do cliente">
-            </div>
-            <div class="form-row">
-                <div class="settings-group">
-                    <label>Plano</label>
-                    <select id="subPlan">
-                        <option value="Mensal">Mensal</option>
-                        <option value="Trimestral">Trimestral</option>
-                        <option value="Semestral">Semestral</option>
-                        <option value="Anual">Anual</option>
-                    </select>
-                </div>
-                <div class="settings-group">
-                    <label>Valor (R$)</label>
-                    <input type="number" id="subPrice" placeholder="0.00" step="0.01">
-                </div>
-            </div>
-            <div class="settings-group">
-                <label>Data de Vencimento</label>
-                <input type="date" id="subEndDate">
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-                <button class="btn btn-secondary" onclick="closeModal('subModal')">Cancelar</button>
-                <button class="btn btn-primary" onclick="createSubscription()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="aptModal">
-        <div class="modal">
-            <h3>Novo Agendamento</h3>
-            <div class="settings-group">
-                <label>Telefone do Cliente</label>
-                <input type="text" id="aptPhone" placeholder="Ex: 47999999999">
-            </div>
-            <div class="settings-group">
-                <label>Nome do Cliente</label>
-                <input type="text" id="aptClientName" placeholder="Nome do cliente">
-            </div>
-            <div class="settings-group">
-                <label>Barbearia</label>
-                <input type="text" id="aptBarbershop" placeholder="Nome da barbearia">
-            </div>
-            <div class="form-row">
-                <div class="settings-group">
-                    <label>Data/Hora</label>
-                    <input type="datetime-local" id="aptDatetime">
-                </div>
-                <div class="settings-group">
-                    <label>Servico</label>
-                    <select id="aptService">
-                        <option value="Corte">Corte</option>
-                        <option value="Barba">Barba</option>
-                        <option value="Corte + Barba">Corte + Barba</option>
-                        <option value="Sobrancelha">Sobrancelha</option>
-                        <option value="Pigmentacao">Pigmentacao</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-                <button class="btn btn-secondary" onclick="closeModal('aptModal')">Cancelar</button>
-                <button class="btn btn-primary" onclick="createAppointment()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="campModal">
         <div class="modal">
             <h3>Nova Campanha</h3>
@@ -528,8 +403,6 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('page-' + name).classList.add('active');
             event.currentTarget.classList.add('active');
-            if (name === 'subscriptions') loadSubscriptions();
-            if (name === 'appointments') loadAppointments();
             if (name === 'campaigns') loadCampaigns();
             if (name === 'notifications') loadNotifications();
         }
@@ -695,116 +568,6 @@
         }
         function closeModal(id) {
             document.getElementById(id).classList.remove('open');
-        }
-
-        // --- SUBSCRIPTIONS ---
-        async function loadSubscriptions() {
-            try {
-                const res = await fetch(`${API}/api/subscriptions`);
-                const data = await res.json();
-                const items = data.subscriptions || data || [];
-                const tbody = document.getElementById('subscriptionsTable');
-                const empty = document.getElementById('subscriptionsEmpty');
-                if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-                empty.style.display = 'none';
-                tbody.innerHTML = items.map(s => {
-                    const statusClass = s.status === 'active' ? 'badge-success' : s.status === 'expired' ? 'badge-danger' : 'badge-warning';
-                    const statusLabel = s.status === 'active' ? 'Ativa' : s.status === 'expired' ? 'Expirada' : s.status;
-                    return `<tr>
-                        <td>${s.name || '-'}</td>
-                        <td>${s.phone || '-'}</td>
-                        <td>${s.plan || '-'}</td>
-                        <td>R$ ${s.price ? Number(s.price).toFixed(2) : '0.00'}</td>
-                        <td>${s.end_date ? new Date(s.end_date).toLocaleDateString('pt-BR') : '-'}</td>
-                        <td><span class="badge ${statusClass}">${statusLabel}</span></td>
-                        <td>
-                            ${s.status !== 'active' ? `<button class="btn btn-success btn-sm" onclick="paySubscription('${s.id}')">Pagar</button>` : ''}
-                            <button class="btn btn-danger btn-sm" onclick="deleteSubscription('${s.id}')">Excluir</button>
-                        </td>
-                    </tr>`;
-                }).join('');
-            } catch (e) {
-                document.getElementById('subscriptionsEmpty').style.display = 'block';
-            }
-        }
-
-        async function createSubscription() {
-            const body = {
-                phone: document.getElementById('subPhone').value.trim(),
-                name: document.getElementById('subName').value.trim(),
-                plan: document.getElementById('subPlan').value,
-                price: parseFloat(document.getElementById('subPrice').value) || 0,
-                end_date: document.getElementById('subEndDate').value
-            };
-            if (!body.phone || !body.name) { alert('Preencha telefone e nome'); return; }
-            try {
-                await fetch(`${API}/api/subscriptions`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-                closeModal('subModal');
-                loadSubscriptions();
-                ['subPhone','subName','subPrice','subEndDate'].forEach(id => document.getElementById(id).value = '');
-            } catch (e) { alert('Erro ao criar assinatura'); }
-        }
-
-        async function deleteSubscription(id) {
-            if (!confirm('Excluir esta assinatura?')) return;
-            await fetch(`${API}/api/subscriptions/${id}`, { method: 'DELETE' });
-            loadSubscriptions();
-        }
-
-        async function paySubscription(id) {
-            await fetch(`${API}/api/subscriptions/${id}/pay`, { method: 'POST' });
-            loadSubscriptions();
-        }
-
-        // --- APPOINTMENTS ---
-        async function loadAppointments() {
-            try {
-                const res = await fetch(`${API}/api/appointments`);
-                const data = await res.json();
-                const items = data.appointments || data || [];
-                const tbody = document.getElementById('appointmentsTable');
-                const empty = document.getElementById('appointmentsEmpty');
-                if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-                empty.style.display = 'none';
-                tbody.innerHTML = items.map(a => {
-                    const dt = a.datetime ? new Date(a.datetime) : null;
-                    const dateStr = dt ? dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}) : '-';
-                    return `<tr>
-                        <td>${a.client_name || '-'}</td>
-                        <td>${a.phone || '-'}</td>
-                        <td>${dateStr}</td>
-                        <td>${a.barbershop || '-'}</td>
-                        <td>${a.service || '-'}</td>
-                        <td><span class="badge badge-info">${a.status || 'Agendado'}</span></td>
-                        <td><button class="btn btn-danger btn-sm" onclick="deleteAppointment('${a.id}')">Excluir</button></td>
-                    </tr>`;
-                }).join('');
-            } catch (e) {
-                document.getElementById('appointmentsEmpty').style.display = 'block';
-            }
-        }
-
-        async function createAppointment() {
-            const body = {
-                phone: document.getElementById('aptPhone').value.trim(),
-                client_name: document.getElementById('aptClientName').value.trim(),
-                barbershop: document.getElementById('aptBarbershop').value.trim(),
-                datetime: document.getElementById('aptDatetime').value,
-                service: document.getElementById('aptService').value
-            };
-            if (!body.phone || !body.client_name || !body.datetime) { alert('Preencha telefone, nome e data/hora'); return; }
-            try {
-                await fetch(`${API}/api/appointments`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-                closeModal('aptModal');
-                loadAppointments();
-                ['aptPhone','aptClientName','aptBarbershop','aptDatetime'].forEach(id => document.getElementById(id).value = '');
-            } catch (e) { alert('Erro ao criar agendamento'); }
-        }
-
-        async function deleteAppointment(id) {
-            if (!confirm('Excluir este agendamento?')) return;
-            await fetch(`${API}/api/appointments/${id}`, { method: 'DELETE' });
-            loadAppointments();
         }
 
         // --- CAMPAIGNS ---

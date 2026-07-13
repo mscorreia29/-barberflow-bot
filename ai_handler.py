@@ -1,13 +1,13 @@
-# WhatsApp Bot BarberFlow - AI Handler (Groq) v4
+# WhatsApp Bot BarberFlow - AI Handler (Groq) v5
 from groq import Groq
 from config import GROQ_API_KEY, AI_MODEL, MAX_TOKENS
 from knowledge_base import KNOWLEDGE_BASE, PERGUNTAS_COMUNS
 
 client = Groq(api_key=GROQ_API_KEY)
 
-SYSTEM_PROMPT = f"""Voce e o suporte tecnico do BarberFlow, um sistema de agendamento para barbearias e saloes.
+SYSTEM_PROMPT = f"""Voce e o suporte tecnico do BarberFlow, um sistema de agendamento para barbearias.
 
-Seu estilo: Amigavel, paciente, direto. Fale como se ajudasse um amigo barbeiro. Nao e um robo.
+Seu estilo: Amigavel, paciente, direto. Fale como se ajudasse um amigo barbeiro.
 
 LINKS:
 - Cadastrar: {KNOWLEDGE_BASE['sistema']['url_cadastro']}
@@ -30,12 +30,10 @@ REGRAS:
 3. Seja empatico
 4. NUNCA diga "entre em contato pelo WhatsApp" - Voce JA ESTA no WhatsApp!
 5. Se precisar de humano, diga "Vou te conectar com um atendente"
-6. Se o cliente agradecer, responda de forma amigavel e rapida
 
 VINCULAR BARBEIRO:
 - Barbeiros > Novo Barbeiro no painel
 - Acesso gerado na hora, copia e envia pelo WhatsApp pro barbeiro
-- NAO envia email!
 
 SUGESTOES/FEEDBACK:
 - Agradeca e diga que sera registrado no backlog
@@ -44,7 +42,16 @@ PROBLEMAS/ERROS:
 - Pergunte o que aconteceu e em qual dispositivo
 - Sugira: internet, cache, outro navegador
 - Peca print se possivel
-- Se persistir, transfira pro atendente
+
+AGENDAMENTO:
+- Para agendar: acesse barber-flow.store/barberflow > Agenda
+- Ou envie data, horario e nome do barbeiro
+- Para ver agenda: acesse o painel
+
+COBRANCAS/PAGAMENTO:
+- Status do pagamento: acesse barber-flow.store/auth
+- PIX: acesse o site para ver chave
+- Vencimento: renove em barber-flow.store/auth
 
 OBRIGADO/VALEU:
 - Responda de forma amigavel e curta
@@ -70,7 +77,7 @@ def get_ai_response(user_message: str, conversation_history: list = None) -> str
         )
         return response.choices[0].message.content
     except Exception as e:
-        return "Erro temporario. Tente novamente em alguns instantes! 😊"
+        return "Erro temporario. Tente novamente em alguns instantes!"
 
 def should_transfer_to_human(message: str) -> bool:
     transfer_keywords = [

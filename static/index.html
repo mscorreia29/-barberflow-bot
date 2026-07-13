@@ -25,7 +25,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
         
-        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; overflow-y: auto; }
         .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid var(--border); }
         .sidebar-brand h1 { font-size: 20px; font-weight: 700; }
         .sidebar-brand h1 span { color: var(--primary); }
@@ -36,6 +36,7 @@
         .nav-item:hover { background: var(--bg3); color: var(--text); }
         .nav-item.active { background: var(--primary-dim); color: var(--primary); font-weight: 600; }
         .nav-item svg { width: 18px; height: 18px; }
+        .nav-separator { height: 1px; background: var(--border); margin: 8px 16px; }
         
         .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
@@ -88,6 +89,9 @@
         .btn-danger:hover { background: #e84040; }
         .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
         .btn-secondary:hover { background: var(--border); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-success { background: var(--success); color: #000; }
+        .btn-success:hover { background: #00b894; }
         
         .conversations-list { max-height: 500px; overflow-y: auto; }
         .conv-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
@@ -127,6 +131,23 @@
         .log-line { color: var(--text2); }
         .log-line .tag { color: var(--primary); }
         
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 12px; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: var(--bg3); }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #00d4aa22; color: var(--success); }
+        .badge-danger { background: #ff475722; color: var(--danger); }
+        .badge-warning { background: #ffa50222; color: var(--warning); }
+        .badge-info { background: #6c5ce722; color: var(--accent); }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { font-size: 18px; margin-bottom: 20px; }
+        
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -158,6 +179,23 @@
             <div class="nav-item" onclick="showPage('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Configuracoes
+            </div>
+            <div class="nav-separator"></div>
+            <div class="nav-item" onclick="showPage('subscriptions')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Assinaturas
+            </div>
+            <div class="nav-item" onclick="showPage('appointments')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Agenda
+            </div>
+            <div class="nav-item" onclick="showPage('campaigns')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Campanhas
+            </div>
+            <div class="nav-item" onclick="showPage('notifications')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
+                Notificacoes
             </div>
         </div>
         <div class="sidebar-footer">
@@ -295,6 +333,189 @@
                 </div>
             </div>
         </div>
+
+        <!-- ASSINATURAS -->
+        <div class="page" id="page-subscriptions">
+            <div class="page-header">
+                <h2>Assinaturas</h2>
+                <p>Gerencie assinaturas dos clientes</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Assinaturas</h3>
+                    <button class="btn btn-primary" onclick="openModal('subModal')">+ Nova Assinatura</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Nome</th><th>Telefone</th><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Acoes</th></tr>
+                    </thead>
+                    <tbody id="subscriptionsTable"></tbody>
+                </table>
+                <div id="subscriptionsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhuma assinatura encontrada</div>
+            </div>
+        </div>
+
+        <!-- AGENDA -->
+        <div class="page" id="page-appointments">
+            <div class="page-header">
+                <h2>Agenda</h2>
+                <p>Gerencie agendamentos dos clientes</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Agendamentos</h3>
+                    <button class="btn btn-primary" onclick="openModal('aptModal')">+ Novo Agendamento</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Cliente</th><th>Telefone</th><th>Data/Hora</th><th>Barbeiro</th><th>Servico</th><th>Status</th><th>Acoes</th></tr>
+                    </thead>
+                    <tbody id="appointmentsTable"></tbody>
+                </table>
+                <div id="appointmentsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum agendamento encontrado</div>
+            </div>
+        </div>
+
+        <!-- CAMPANHAS -->
+        <div class="page" id="page-campaigns">
+            <div class="page-header">
+                <h2>Campanhas</h2>
+                <p>Gerencie campanhas de marketing</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Lista de Campanhas</h3>
+                    <button class="btn btn-primary" onclick="openModal('campModal')">+ Nova Campanha</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Nome</th><th>Mensagem</th><th>Destinatarios</th><th>Envio</th><th>Acoes</th></tr>
+                    </thead>
+                    <tbody id="campaignsTable"></tbody>
+                </table>
+                <div id="campaignsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhuma campanha encontrada</div>
+            </div>
+        </div>
+
+        <!-- NOTIFICACOES -->
+        <div class="page" id="page-notifications">
+            <div class="page-header">
+                <h2>Notificacoes</h2>
+                <p>Visualize notificacoes pendentes e enviadas</p>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3>Pendentes</h3></div>
+                    <div id="pendingNotifications"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Enviadas</h3></div>
+                    <div id="sentNotifications"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="subModal">
+        <div class="modal">
+            <h3>Nova Assinatura</h3>
+            <div class="settings-group">
+                <label>Telefone</label>
+                <input type="text" id="subPhone" placeholder="Ex: 47999999999">
+            </div>
+            <div class="settings-group">
+                <label>Nome</label>
+                <input type="text" id="subName" placeholder="Nome do cliente">
+            </div>
+            <div class="form-row">
+                <div class="settings-group">
+                    <label>Plano</label>
+                    <select id="subPlan">
+                        <option value="Mensal">Mensal</option>
+                        <option value="Trimestral">Trimestral</option>
+                        <option value="Semestral">Semestral</option>
+                        <option value="Anual">Anual</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="subPrice" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+            <div class="settings-group">
+                <label>Data de Vencimento</label>
+                <input type="date" id="subEndDate">
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('subModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createSubscription()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="aptModal">
+        <div class="modal">
+            <h3>Novo Agendamento</h3>
+            <div class="settings-group">
+                <label>Telefone do Cliente</label>
+                <input type="text" id="aptPhone" placeholder="Ex: 47999999999">
+            </div>
+            <div class="settings-group">
+                <label>Nome do Cliente</label>
+                <input type="text" id="aptClientName" placeholder="Nome do cliente">
+            </div>
+            <div class="settings-group">
+                <label>Barbearia</label>
+                <input type="text" id="aptBarbershop" placeholder="Nome da barbearia">
+            </div>
+            <div class="form-row">
+                <div class="settings-group">
+                    <label>Data/Hora</label>
+                    <input type="datetime-local" id="aptDatetime">
+                </div>
+                <div class="settings-group">
+                    <label>Servico</label>
+                    <select id="aptService">
+                        <option value="Corte">Corte</option>
+                        <option value="Barba">Barba</option>
+                        <option value="Corte + Barba">Corte + Barba</option>
+                        <option value="Sobrancelha">Sobrancelha</option>
+                        <option value="Pigmentacao">Pigmentacao</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('aptModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createAppointment()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="campModal">
+        <div class="modal">
+            <h3>Nova Campanha</h3>
+            <div class="settings-group">
+                <label>Nome da Campanha</label>
+                <input type="text" id="campName" placeholder="Ex: Promocao de verao">
+            </div>
+            <div class="settings-group">
+                <label>Mensagem</label>
+                <textarea id="campMessage" placeholder="Texto da campanha..."></textarea>
+            </div>
+            <div class="settings-group">
+                <label>Telefones dos Destinatarios (um por linha)</label>
+                <textarea id="campRecipients" placeholder="47999999999&#10;47888888888"></textarea>
+            </div>
+            <div class="settings-group">
+                <label>Data/Hora de Envio</label>
+                <input type="datetime-local" id="campSendAt">
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('campModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createCampaign()">Salvar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -307,6 +528,10 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('page-' + name).classList.add('active');
             event.currentTarget.classList.add('active');
+            if (name === 'subscriptions') loadSubscriptions();
+            if (name === 'appointments') loadAppointments();
+            if (name === 'campaigns') loadCampaigns();
+            if (name === 'notifications') loadNotifications();
         }
         
         async function checkStatus() {
@@ -462,6 +687,207 @@
         
         function saveSettings() {
             alert('Configuracoes salvas! (Em breve sera persistente)');
+        }
+
+        // --- MODALS ---
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+
+        // --- SUBSCRIPTIONS ---
+        async function loadSubscriptions() {
+            try {
+                const res = await fetch(`${API}/api/subscriptions`);
+                const data = await res.json();
+                const items = data.subscriptions || data || [];
+                const tbody = document.getElementById('subscriptionsTable');
+                const empty = document.getElementById('subscriptionsEmpty');
+                if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                tbody.innerHTML = items.map(s => {
+                    const statusClass = s.status === 'active' ? 'badge-success' : s.status === 'expired' ? 'badge-danger' : 'badge-warning';
+                    const statusLabel = s.status === 'active' ? 'Ativa' : s.status === 'expired' ? 'Expirada' : s.status;
+                    return `<tr>
+                        <td>${s.name || '-'}</td>
+                        <td>${s.phone || '-'}</td>
+                        <td>${s.plan || '-'}</td>
+                        <td>R$ ${s.price ? Number(s.price).toFixed(2) : '0.00'}</td>
+                        <td>${s.end_date ? new Date(s.end_date).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+                        <td>
+                            ${s.status !== 'active' ? `<button class="btn btn-success btn-sm" onclick="paySubscription('${s.id}')">Pagar</button>` : ''}
+                            <button class="btn btn-danger btn-sm" onclick="deleteSubscription('${s.id}')">Excluir</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                document.getElementById('subscriptionsEmpty').style.display = 'block';
+            }
+        }
+
+        async function createSubscription() {
+            const body = {
+                phone: document.getElementById('subPhone').value.trim(),
+                name: document.getElementById('subName').value.trim(),
+                plan: document.getElementById('subPlan').value,
+                price: parseFloat(document.getElementById('subPrice').value) || 0,
+                end_date: document.getElementById('subEndDate').value
+            };
+            if (!body.phone || !body.name) { alert('Preencha telefone e nome'); return; }
+            try {
+                await fetch(`${API}/api/subscriptions`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                closeModal('subModal');
+                loadSubscriptions();
+                ['subPhone','subName','subPrice','subEndDate'].forEach(id => document.getElementById(id).value = '');
+            } catch (e) { alert('Erro ao criar assinatura'); }
+        }
+
+        async function deleteSubscription(id) {
+            if (!confirm('Excluir esta assinatura?')) return;
+            await fetch(`${API}/api/subscriptions/${id}`, { method: 'DELETE' });
+            loadSubscriptions();
+        }
+
+        async function paySubscription(id) {
+            await fetch(`${API}/api/subscriptions/${id}/pay`, { method: 'POST' });
+            loadSubscriptions();
+        }
+
+        // --- APPOINTMENTS ---
+        async function loadAppointments() {
+            try {
+                const res = await fetch(`${API}/api/appointments`);
+                const data = await res.json();
+                const items = data.appointments || data || [];
+                const tbody = document.getElementById('appointmentsTable');
+                const empty = document.getElementById('appointmentsEmpty');
+                if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                tbody.innerHTML = items.map(a => {
+                    const dt = a.datetime ? new Date(a.datetime) : null;
+                    const dateStr = dt ? dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}) : '-';
+                    return `<tr>
+                        <td>${a.client_name || '-'}</td>
+                        <td>${a.phone || '-'}</td>
+                        <td>${dateStr}</td>
+                        <td>${a.barbershop || '-'}</td>
+                        <td>${a.service || '-'}</td>
+                        <td><span class="badge badge-info">${a.status || 'Agendado'}</span></td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteAppointment('${a.id}')">Excluir</button></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                document.getElementById('appointmentsEmpty').style.display = 'block';
+            }
+        }
+
+        async function createAppointment() {
+            const body = {
+                phone: document.getElementById('aptPhone').value.trim(),
+                client_name: document.getElementById('aptClientName').value.trim(),
+                barbershop: document.getElementById('aptBarbershop').value.trim(),
+                datetime: document.getElementById('aptDatetime').value,
+                service: document.getElementById('aptService').value
+            };
+            if (!body.phone || !body.client_name || !body.datetime) { alert('Preencha telefone, nome e data/hora'); return; }
+            try {
+                await fetch(`${API}/api/appointments`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                closeModal('aptModal');
+                loadAppointments();
+                ['aptPhone','aptClientName','aptBarbershop','aptDatetime'].forEach(id => document.getElementById(id).value = '');
+            } catch (e) { alert('Erro ao criar agendamento'); }
+        }
+
+        async function deleteAppointment(id) {
+            if (!confirm('Excluir este agendamento?')) return;
+            await fetch(`${API}/api/appointments/${id}`, { method: 'DELETE' });
+            loadAppointments();
+        }
+
+        // --- CAMPAIGNS ---
+        async function loadCampaigns() {
+            try {
+                const res = await fetch(`${API}/api/campaigns`);
+                const data = await res.json();
+                const items = data.campaigns || data || [];
+                const tbody = document.getElementById('campaignsTable');
+                const empty = document.getElementById('campaignsEmpty');
+                if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+                empty.style.display = 'none';
+                tbody.innerHTML = items.map(c => {
+                    const recipients = Array.isArray(c.recipients) ? c.recipients.length : (c.recipients ? String(c.recipients).split(',').length : 0);
+                    const sendStr = c.send_at ? new Date(c.send_at).toLocaleString('pt-BR') : '-';
+                    return `<tr>
+                        <td>${c.name || '-'}</td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.message || '-'}</td>
+                        <td>${recipients}</td>
+                        <td>${sendStr}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteCampaign('${c.id}')">Excluir</button></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                document.getElementById('campaignsEmpty').style.display = 'block';
+            }
+        }
+
+        async function createCampaign() {
+            const recipientsRaw = document.getElementById('campRecipients').value.trim();
+            const recipients = recipientsRaw ? recipientsRaw.split('\n').map(r => r.trim()).filter(Boolean) : [];
+            const body = {
+                name: document.getElementById('campName').value.trim(),
+                message: document.getElementById('campMessage').value.trim(),
+                recipients,
+                send_at: document.getElementById('campSendAt').value
+            };
+            if (!body.name || !body.message) { alert('Preencha nome e mensagem'); return; }
+            try {
+                await fetch(`${API}/api/campaigns`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                closeModal('campModal');
+                loadCampaigns();
+                ['campName','campMessage','campRecipients','campSendAt'].forEach(id => document.getElementById(id).value = '');
+            } catch (e) { alert('Erro ao criar campanha'); }
+        }
+
+        async function deleteCampaign(id) {
+            if (!confirm('Excluir esta campanha?')) return;
+            await fetch(`${API}/api/campaigns/${id}`, { method: 'DELETE' });
+            loadCampaigns();
+        }
+
+        // --- NOTIFICATIONS ---
+        async function loadNotifications() {
+            const pendingDiv = document.getElementById('pendingNotifications');
+            const sentDiv = document.getElementById('sentNotifications');
+            try {
+                const [pendRes, sentRes] = await Promise.all([
+                    fetch(`${API}/api/notifications/pending`),
+                    fetch(`${API}/api/notifications/sent`)
+                ]);
+                const pendData = await pendRes.json();
+                const sentData = await sentRes.json();
+                const pending = pendData.notifications || pendData || [];
+                const sent = sentData.notifications || sentData || [];
+                pendingDiv.innerHTML = pending.length ? pending.map(n => `
+                    <div style="padding:12px;border-bottom:1px solid var(--border)">
+                        <div style="font-size:13px;font-weight:600">${n.phone || '-'}</div>
+                        <div style="font-size:12px;color:var(--text2);margin-top:4px">${n.message || '-'}</div>
+                        <div style="font-size:11px;color:var(--text2);margin-top:4px">${n.created_at ? new Date(n.created_at).toLocaleString('pt-BR') : ''}</div>
+                    </div>
+                `).join('') : '<div style="padding:40px;text-align:center;color:var(--text2)">Nenhuma notificacao pendente</div>';
+                sentDiv.innerHTML = sent.length ? sent.map(n => `
+                    <div style="padding:12px;border-bottom:1px solid var(--border)">
+                        <div style="font-size:13px;font-weight:600">${n.phone || '-'}</div>
+                        <div style="font-size:12px;color:var(--text2);margin-top:4px">${n.message || '-'}</div>
+                        <div style="font-size:11px;color:var(--text2);margin-top:4px">${n.sent_at ? new Date(n.sent_at).toLocaleString('pt-BR') : ''}</div>
+                    </div>
+                `).join('') : '<div style="padding:40px;text-align:center;color:var(--text2)">Nenhuma notificacao enviada</div>';
+            } catch (e) {
+                pendingDiv.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Erro ao carregar</div>';
+                sentDiv.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text2)">Erro ao carregar</div>';
+            }
         }
         
         checkStatus();

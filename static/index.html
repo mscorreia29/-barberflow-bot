@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarberFlow Bot - Painel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; }
+        .header h1 { font-size: 24px; font-weight: 700; }
+        .header h1 span { color: #00d4aa; }
+        .status-badge { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .status-online { background: #00d4aa22; color: #00d4aa; border: 1px solid #00d4aa; }
+        .status-offline { background: #ff444422; color: #ff4444; border: 1px solid #ff4444; }
+        .status-connecting { background: #ffaa0022; color: #ffaa00; border: 1px solid #ffaa00; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        
+        .card { background: #1a1a2e; border-radius: 12px; padding: 24px; border: 1px solid #333; }
+        .card h2 { font-size: 16px; color: #888; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .qr-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; }
+        .qr-container img { max-width: 280px; border-radius: 12px; border: 2px solid #333; }
+        .qr-placeholder { color: #666; font-size: 14px; text-align: center; }
+        .qr-placeholder .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #00d4aa; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .stat-item { background: #0f0f23; border-radius: 8px; padding: 16px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #00d4aa; }
+        .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+        
+        .info-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { color: #888; }
+        .info-value { color: #fff; font-weight: 500; }
+        
+        .btn { display: inline-block; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary { background: #00d4aa; color: #000; }
+        .btn-primary:hover { background: #00b894; transform: translateY(-1px); }
+        .btn-secondary { background: #333; color: #fff; }
+        .btn-secondary:hover { background: #444; }
+        
+        .chat-preview { background: #0f0f23; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; line-height: 1.6; }
+        .chat-line { margin-bottom: 4px; }
+        .chat-time { color: #666; }
+        .chat-msg { color: #00d4aa; }
+        
+        .footer { text-align: center; padding: 20px; color: #444; font-size: 12px; margin-top: 30px; }
+        
+        .connected-animation { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 #00d4aa44; } 50% { box-shadow: 0 0 20px 5px #00d4aa22; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span>Barber</span>Flow Bot</h1>
+        <span id="statusBadge" class="status-badge status-connecting">Conectando...</span>
+    </div>
+    
+    <div class="container">
+        <div class="grid">
+            <div class="card">
+                <h2>WhatsApp - QR Code</h2>
+                <div class="qr-container" id="qrContainer">
+                    <div class="qr-placeholder">
+                        <div class="spinner"></div>
+                        Gerando QR Code...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Estatisticas</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalConversations">0</div>
+                        <div class="stat-label">Conversas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="activeConversations">0</div>
+                        <div class="stat-label">Ativas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="transferredUsers">0</div>
+                        <div class="stat-label">Transferidas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="bridgeUptime">-</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Informacoes</h2>
+                <div class="info-item">
+                    <span class="info-label">Bot</span>
+                    <span class="info-value">Suporte BarberFlow</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">IA</span>
+                    <span class="info-value">Groq Llama 3.3 70B</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Suporte</span>
+                    <span class="info-value">Seg-Sab 9h-19h</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">WhatsApp</span>
+                    <span class="info-value">(47) 99675-9164</span>
+                </div>
+                <div style="margin-top: 16px;">
+                    <a href="https://barber-flow.store" target="_blank" class="btn btn-primary">Acessar BarberFlow</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Log em Tempo Real</h2>
+                <div class="chat-preview" id="chatLog">
+                    <div class="chat-line"><span class="chat-time">[--:--]</span> Aguardandoconexao...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        BarberFlow Bot &copy; 2025 | Suporte: (47) 99675-9164
+    </div>
+
+    <script>
+        const API = '';
+        let bridgeRunning = false;
+        let startTime = null;
+        
+        async function checkStatus() {
+            try {
+                const res = await fetch(`${API}/health`);
+                const data = await res.json();
+                const badge = document.getElementById('statusBadge');
+                
+                if (data.bridge_running) {
+                    badge.textContent = 'Online';
+                    badge.className = 'status-badge status-online';
+                    if (!startTime) startTime = Date.now();
+                    bridgeRunning = true;
+                } else {
+                    badge.textContent = 'Desconectado';
+                    badge.className = 'status-badge status-offline';
+                    bridgeRunning = false;
+                }
+            } catch (e) {
+                const badge = document.getElementById('statusBadge');
+                badge.textContent = 'Erro de conexao';
+                badge.className = 'status-badge status-offline';
+            }
+        }
+        
+        async function loadQR() {
+            const container = document.getElementById('qrContainer');
+            try {
+                const res = await fetch(`${API}/qr`);
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    container.innerHTML = `<img src="${url}" alt="QR Code" class="connected-animation">`;
+                } else {
+                    container.innerHTML = '<div class="qr-placeholder"><div class="spinner"></div>Gerando QR Code...</div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="qr-placeholder">Erro ao carregar QR</div>';
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API}/stats`);
+                const data = await res.json();
+                document.getElementById('totalConversations').textContent = data.total_conversations || 0;
+                document.getElementById('activeConversations').textContent = data.active_conversations || 0;
+                document.getElementById('transferredUsers').textContent = data.transferred_users || 0;
+                
+                if (startTime) {
+                    const diff = Math.floor((Date.now() - startTime) / 1000);
+                    const min = Math.floor(diff / 60);
+                    const hr = Math.floor(min / 60);
+                    document.getElementById('bridgeUptime').textContent = hr > 0 ? `${hr}h${min%60}m` : `${min}m`;
+                }
+                
+                if (data.bridge_log) {
+                    const logEl = document.getElementById('chatLog');
+                    const lines = data.bridge_log.split('\n').slice(-20);
+                    logEl.innerHTML = lines.map(l => `<div class="chat-line"><span class="chat-msg">${l}</span></div>`).join('');
+                    logEl.scrollTop = logEl.scrollHeight;
+                }
+            } catch (e) {}
+        }
+        
+        checkStatus();
+        loadQR();
+        loadStats();
+        
+        setInterval(checkStatus, 5000);
+        setInterval(loadQR, 10000);
+        setInterval(loadStats, 5000);
+    </script>
+</body>
+</html>

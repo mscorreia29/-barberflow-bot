@@ -37,16 +37,16 @@ t = threading.Thread(target=start_bridge, daemon=True)
 t.start()
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from bot import bot
 from config import BOT_NAME
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 QR_FILE = '/app/whatsapp-bridge/qrcode.png'
 
 @app.route('/')
 def root():
-    return jsonify({"status": "running", "bot": BOT_NAME, "endpoints": ["/health", "/chat", "/stats", "/qr"]})
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/health')
 def health():

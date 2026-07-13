@@ -50,7 +50,7 @@ app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not session.get("tenant_id"):
+        if not session.get("tenant_id") and not session.get("is_admin"):
             if request.is_json or request.path.startswith("/api/"):
                 return jsonify({"error": "Nao autenticado"}), 401
             return redirect(url_for("login_page"))
@@ -199,6 +199,12 @@ body{{font-family:'Inter',-apple-system,sans-serif;background:#0b0e14;color:#e4e
 def login_post():
     email = request.form.get("email", "")
     password = request.form.get("password", "")
+    
+    if tenants.authenticate_admin(email, password):
+        session["is_admin"] = True
+        session["admin_email"] = email
+        return redirect("/dashboard")
+    
     tenant = tenants.authenticate(email, password)
     if tenant:
         session["tenant_id"] = tenant["id"]

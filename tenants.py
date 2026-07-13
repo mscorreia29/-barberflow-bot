@@ -60,7 +60,7 @@ class TenantManager:
         if not admin:
             admin = {
                 "email": "admin@autoassist.com",
-                "password": hash_password("admin123"),
+                "password": hash_password("aa2026!"),
                 "created_at": datetime.now().isoformat()
             }
             save_json(ADMIN_FILE, admin)

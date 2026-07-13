@@ -729,6 +729,6 @@ def owner_export_conversations():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print(f"[API] AutoAssist Multi-Tenant em http://0.0.0.0:{port}", flush=True)
-    print(f"[API] Admin: admin@autoassist.com / admin123", flush=True)
+    print(f"[API] Admin: admin@autoassist.com / aa2026!", flush=True)
     print(f"[API] Dashboard: /dashboard", flush=True)
     app.run(host='0.0.0.0', port=port, debug=False)

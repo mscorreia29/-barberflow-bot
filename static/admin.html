@@ -103,6 +103,35 @@
         </div>
     </div>
 
+    <!-- EDIT TENANT MODAL -->
+    <div class="modal-overlay" id="editTenantModal">
+        <div class="modal">
+            <h3>Editar Tenant</h3>
+            <input type="hidden" id="editTenantId">
+            <div class="row">
+                <div class="settings-group"><label>Nome</label><input type="text" id="editTName"></div>
+                <div class="settings-group"><label>Negocio</label><input type="text" id="editTBusiness"></div>
+            </div>
+            <div class="settings-group"><label>Email</label><input type="email" id="editTEmail"></div>
+            <div class="settings-group"><label>Senha (deixe vazio pra manter)</label><input type="password" id="editTPassword"></div>
+            <div class="row">
+                <div class="settings-group"><label>Plano</label>
+                    <select id="editTPlan"><option value="free">Free</option><option value="basico">Basico</option><option value="pro">Pro</option></select>
+                </div>
+                <div class="settings-group"><label>Status</label>
+                    <select id="editTStatus"><option value="active">Ativo</option><option value="inactive">Inativo</option></select>
+                </div>
+            </div>
+            <div class="settings-group"><label>Tipo</label>
+                <select id="editTType"><option value="barbearia">Barbearia</option><option value="salao">Salao</option><option value="clinica">Clinica</option><option value="academia">Academia</option><option value="restaurante">Restaurante</option><option value="loja">Loja</option><option value="servicos">Servicos</option><option value="geral">Outro</option></select>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('editTenantModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveEditTenant()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TENANT MODAL -->
     <div class="modal-overlay" id="tenantModal">
         <div class="modal">
@@ -161,7 +190,7 @@
                 <td><span class="badge badge-active">${t.plan}</span></td>
                 <td><span class="badge ${t.status==='active'?'badge-active':'badge-inactive'}">${t.status}</span></td>
                 <td>${t.stats?.total_conversations||0}</td>
-                <td><button class="btn btn-secondary btn-sm" onclick="toggleTenant('${t.id}','${t.status}')">${t.status==='active'?'Desativar':'Ativar'}</button> <button class="btn btn-danger btn-sm" onclick="deleteTenant('${t.id}')">Excluir</button></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="editTenant('${t.id}')">Editar</button> <button class="btn btn-secondary btn-sm" onclick="toggleTenant('${t.id}','${t.status}')">${t.status==='active'?'Desativar':'Ativar'}</button> <button class="btn btn-danger btn-sm" onclick="deleteTenant('${t.id}')">Excluir</button></td>
             </tr>`).join('');
         }
         async function createTenant(){
@@ -172,6 +201,8 @@
         }
         async function toggleTenant(id,s){await fetch('/admin/api/tenants/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s==='active'?'inactive':'active'})});loadTenants()}
         async function deleteTenant(id){if(!confirm('Excluir este tenant e todos os dados?'))return;await fetch('/admin/api/tenants/'+id,{method:'DELETE'});loadTenants()}
+        function editTenant(id){const t=allTenants.find(x=>x.id===id);if(!t)return;document.getElementById('editTenantId').value=id;document.getElementById('editTName').value=t.name;document.getElementById('editTBusiness').value=t.business_name||'';document.getElementById('editTEmail').value=t.email;document.getElementById('editTPassword').value='';document.getElementById('editTPlan').value=t.plan||'free';document.getElementById('editTStatus').value=t.status||'active';document.getElementById('editTType').value=t.business_type||'geral';openModal('editTenantModal')}
+        async function saveEditTenant(){const id=document.getElementById('editTenantId').value;const body={name:document.getElementById('editTName').value.trim(),business_name:document.getElementById('editTBusiness').value.trim(),email:document.getElementById('editTEmail').value.trim(),plan:document.getElementById('editTPlan').value,status:document.getElementById('editTStatus').value,business_type:document.getElementById('editTType').value};const pw=document.getElementById('editTPassword').value.trim();if(pw)body.password=pw;if(!body.name||!body.email)return alert('Preencha nome e email');await fetch('/admin/api/tenants/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});closeModal('editTenantModal');loadTenants()}
 
         // === TEMPLATES ===
         let allTemplates=[];

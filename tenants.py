@@ -177,7 +177,10 @@ class TenantManager:
             if t["id"] == tenant_id:
                 for k, v in kwargs.items():
                     if k != "id" and k != "created_at":
-                        t[k] = v
+                        if k == "password" and v:
+                            t[k] = hash_password(v)
+                        else:
+                            t[k] = v
                 t["updated_at"] = datetime.now().isoformat()
                 save_json(os.path.join(DATA_DIR, "tenants.json"), tenants)
                 return t

@@ -42,7 +42,6 @@ from bot import bot
 from config import BOT_NAME
 
 app = Flask(__name__, static_folder='static')
-QR_FILE = '/app/whatsapp-bridge/qrcode.png'
 
 @app.route('/')
 def root():
@@ -54,8 +53,9 @@ def health():
 
 @app.route('/qr')
 def qr_code():
-    if os.path.exists(QR_FILE):
-        return send_file(QR_FILE, mimetype='image/png')
+    qr = '/app/whatsapp-bridge/qrcode.png'
+    if os.path.exists(qr):
+        return send_file(qr, mimetype='image/png')
     return jsonify({"error": "QR Code ainda nao gerado"}), 404
 
 @app.route('/chat', methods=['POST'])
@@ -78,12 +78,25 @@ def chat():
 def stats():
     s = bot.get_stats()
     s["bridge"] = bridge_status
+    s["conversations"] = {}
+    for phone, msgs in bot.conversations.items():
+        s["conversations"][phone] = [{"role": m["role"], "content": m["content"]} for m in msgs]
     try:
         with open("/app/bridge.log") as f:
-            s["bridge_log"] = f.read()[-1500:]
+            s["bridge_log"] = f.read()[-2000:]
     except:
         s["bridge_log"] = ""
     return jsonify(s)
+
+@app.route('/conversations/<phone>')
+def get_conversation(phone):
+    if phone in bot.conversations:
+        return jsonify(bot.conversations[phone])
+    return jsonify([])
+
+@app.route('/send', methods=['POST'])
+def send_message():
+    return jsonify({"error": "Envio manual ainda nao implementado. Use o WhatsApp direto."}), 501
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

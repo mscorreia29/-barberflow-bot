@@ -113,12 +113,34 @@ KEYWORD_RESPONSES = {
     # === AGENDAMENTO ===
     "agendar": "/agendar", "marcar horario": "/agendar",
     "agendamento": "/agendar", "horario disponivel": "/agendar",
+    "marcar horario": "/agendar", "quero agendar": "/agendar",
     "ver agenda": "/ver_agenda", "minha agenda": "/ver_agenda",
-    "consultar agenda": "/ver_agenda",
+    "consultar agenda": "/ver_agenda", "agenda do dia": "/ver_agenda",
+    "agenda de hoje": "/ver_agenda",
     
-    # === MARKETING ===
-    "promocao": "/promocao", "divulgar": "/promocao",
-    "campanha": "/promocao", "desconto": "/promocao",
+    # === SERVICOS ===
+    "como cadastrar servico": "/como_servico", "cadastrar servico": "/como_servico",
+    "adicionar servico": "/como_servico", "novos servicos": "/como_servico",
+    "quanto cobrar": "/como_servico",
+    
+    # === CLIENTES ===
+    "cadastrar cliente": "/como_cliente", "como cadastro cliente": "/como_cliente",
+    "adicionar cliente": "/como_cliente", "lista de clientes": "/como_cliente",
+    "clientes": "/como_cliente",
+    
+    # === PROBLEMAS ===
+    "nao consigo agendar": "/problema_agenda", "agenda nao funciona": "/problema_agenda",
+    "nao ta agendando": "/problema_agenda",
+    "notificacao nao chega": "/problema_notificacao", "cliente nao recebe": "/problema_notificacao",
+    "notificacao nao vai": "/problema_notificacao",
+    "app nao funciona": "/problema_tecnico", "site caiu": "/problema_tecnico",
+    "sistema fora": "/problema_tecnico", "nao consigo acessar": "/problema_tecnico",
+    "tela branca": "/problema_tecnico", "travou": "/problema_tecnico",
+    
+    # === LINK ===
+    "link de agendamento": "/compartilhar", "link pros clientes": "/compartilhar",
+    "como mando pro cliente": "/compartilhar", "link do barberflow": "/compartilhar",
+    "meu link": "/compartilhar", "link unico": "/compartilhar",
 }
 
 PROBLEM_KEYWORDS = [

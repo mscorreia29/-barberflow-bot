@@ -23,8 +23,10 @@ def save_json(path, data):
 
 
 class Analytics:
-    def __init__(self):
-        self.data = load_json(ANALYTICS_FILE, {"messages": [], "response_times": []})
+    def __init__(self, data=None):
+        self.data = data if data is not None else load_json(ANALYTICS_FILE, {"messages": [], "response_times": []})
+        if "messages" not in self.data: self.data["messages"] = []
+        if "response_times" not in self.data: self.data["response_times"] = []
     
     def _save(self):
         save_json(ANALYTICS_FILE, self.data)
@@ -86,8 +88,8 @@ class Analytics:
 
 
 class ContactManager:
-    def __init__(self):
-        self.contacts = load_json(CONTACTS_FILE, [])
+    def __init__(self, data=None):
+        self.contacts = data if data is not None else load_json(CONTACTS_FILE, [])
     
     def _save(self):
         save_json(CONTACTS_FILE, self.contacts)
@@ -167,9 +169,9 @@ class ContactManager:
 
 
 class TemplateManager:
-    def __init__(self):
-        self.templates = load_json(TEMPLATES_FILE, [])
-        if not self.templates:
+    def __init__(self, data=None):
+        self.templates = data if data is not None else load_json(TEMPLATES_FILE, [])
+        if not self.templates and data is None:
             self._create_defaults()
     
     def _save(self):

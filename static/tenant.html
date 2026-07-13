@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoAssist - Painel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <style>
+        :root{--bg:#0b0e14;--bg2:#111520;--bg3:#161b28;--card:#1a1f2e;--border:#252d3d;--text:#e4e8f0;--text2:#8892a4;--primary:#00d4aa;--primary-dim:#00d4aa22;--accent:#6c5ce7;--danger:#ff4757;--warning:#ffa502;--success:#00d4aa}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+        .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
+        .sidebar-brand{padding:24px 20px;border-bottom:1px solid var(--border)}
+        .sidebar-brand h1{font-size:20px;font-weight:700} .sidebar-brand h1 span{color:var(--primary)}
+        .sidebar-brand small{color:var(--text2);font-size:11px;display:block;margin-top:4px}
+        .sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;cursor:pointer;color:var(--text2);transition:all .2s;font-size:14px}
+        .nav-item:hover{background:var(--bg3);color:var(--text)} .nav-item.active{background:var(--primary-dim);color:var(--primary);font-weight:600}
+        .nav-item svg{width:18px;height:18px} .nav-sep{height:1px;background:var(--border);margin:8px 16px}
+        .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+        .sidebar-footer a{color:var(--danger);text-decoration:none;font-weight:600}
+        .main{margin-left:240px;padding:24px 32px}
+        .page{display:none} .page.active{display:block}
+        .page-header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start}
+        .page-header h2{font-size:22px;font-weight:700} .page-header p{color:var(--text2);font-size:14px;margin-top:4px}
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+        @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+        .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+        .stat-card .label{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+        .stat-card .value{font-size:28px;font-weight:700;margin-top:4px} .stat-card .value.green{color:var(--primary)}
+        .stat-card .value.purple{color:var(--accent)} .stat-card .value.yellow{color:var(--warning)}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px} .card-header h3{font-size:16px;font-weight:600}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+        .btn-primary{background:var(--primary);color:#000} .btn-primary:hover{background:#00b894}
+        .btn-danger{background:var(--danger);color:#fff} .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+        .btn-sm{padding:6px 12px;font-size:12px}
+        .settings-group{margin-bottom:20px} .settings-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+        .settings-group input,.settings-group textarea,.settings-group select{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit}
+        .settings-group input:focus,.settings-group textarea:focus{border-color:var(--primary)} .settings-group textarea{resize:vertical;min-height:80px}
+        .info-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px} .info-row:last-child{border-bottom:none} .info-row .label{color:var(--text2)}
+        .tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--accent);color:#fff;margin:2px}
+        table{width:100%;border-collapse:collapse;font-size:14px}
+        th{text-align:left;padding:12px;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+        td{padding:12px;border-bottom:1px solid var(--border)} tr:hover td{background:var(--bg3)}
+        .empty-state{text-align:center;padding:40px;color:var(--text2)}
+        .badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600} .badge-success{background:#00d4aa22;color:var(--success)}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+        .modal-overlay.open{display:flex} .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+        .modal h3{font-size:18px;margin-bottom:20px}
+        .search-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:16px}
+        ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand"><h1><span>Auto</span>Assist</h1><small id="businessName">Carregando...</small></div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" onclick="showPage('dashboard',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="showPage('knowledge',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Base de Conhecimento
+            </div>
+            <div class="nav-sep"></div>
+            <div class="nav-item" onclick="showPage('contacts',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Contatos
+            </div>
+            <div class="nav-item" onclick="showPage('templates',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                Templates
+            </div>
+            <div class="nav-item" onclick="showPage('send',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Enviar Mensagem
+            </div>
+            <div class="nav-sep"></div>
+            <div class="nav-item" onclick="showPage('config',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Configuracoes
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <span id="userEmail">-</span>
+                <a href="/logout">Sair</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <!-- DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+            <div class="page-header"><div><h2>Dashboard</h2><p>Visao geral do seu bot</p></div></div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="label">Conversas</div><div class="value green" id="statConvs">0</div></div>
+                <div class="stat-card"><div class="label">Contatos</div><div class="value purple" id="statContacts">0</div></div>
+                <div class="stat-card"><div class="label">Templates</div><div class="value" id="statTemplates">0</div></div>
+                <div class="stat-card"><div class="label">Mensagens</div><div class="value yellow" id="statMsgs">0</div></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3>Como funciona</h3></div>
+                <div style="color:var(--text2);font-size:14px;line-height:1.8">
+                    <p>1. Configure sua <strong>Base de Conhecimento</strong> com as informacoes do seu negocio</p>
+                    <p>2. Crie <strong>Templates</strong> de resposta para perguntas frequentes</p>
+                    <p>3. O bot responde automaticamente seus clientes pelo WhatsApp</p>
+                    <p>4. Use <strong>Enviar Mensagem</strong> para disparar mensagens manuais</p>
+                    <p style="margin-top:12px"><strong>Proximo passo:</strong> Va em "Base de Conhecimento" e configure as informacoes do seu negocio!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- KNOWLEDGE BASE -->
+        <div class="page" id="page-knowledge">
+            <div class="page-header"><div><h2>Base de Conhecimento</h2><p>Configure as informacoes que o bot usa para responder</p></div>
+                <div class="actions"><button class="btn btn-primary" onclick="saveKnowledge()">Salvar</button></div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="margin-bottom:16px">Informacoes do Negocio</h3>
+                    <div class="settings-group"><label>Nome do Bot</label><input type="text" id="kbBotName"></div>
+                    <div class="settings-group"><label>Nome do Negocio</label><input type="text" id="kbBusinessName"></div>
+                    <div class="settings-group"><label>Tipo</label>
+                        <select id="kbBusinessType">
+                            <option value="barbearia">Barbearia</option><option value="salao">Salao</option>
+                            <option value="clinica">Clinica</option><option value="academia">Academia</option>
+                            <option value="restaurante">Restaurante</option><option value="loja">Loja</option>
+                            <option value="servicos">Servicos</option><option value="geral">Outro</option>
+                        </select>
+                    </div>
+                    <div class="settings-group"><label>Horario de Atendimento</label><input type="text" id="kbHours"></div>
+                    <div class="settings-group"><label>Telefone</label><input type="text" id="kbPhone"></div>
+                    <div class="settings-group"><label>Website</label><input type="text" id="kbWebsite"></div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:16px">Mensagem de Boas-vindas</h3>
+                    <div class="settings-group"><textarea id="kbGreeting" style="min-height:120px"></textarea></div>
+                    <h3 style="margin-bottom:16px;margin-top:24px">Respostas Automaticas</h3>
+                    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Defina respostas para perguntas frequentes. Use a chave como keyword.</p>
+                    <div id="kbResponses"></div>
+                    <button class="btn btn-secondary btn-sm" onclick="addResponse()" style="margin-top:8px">+ Adicionar Resposta</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACTS -->
+        <div class="page" id="page-contacts">
+            <div class="page-header"><div><h2>Contatos</h2><p>Gerencie seus contatos</p></div>
+                <div class="actions"><button class="btn btn-secondary" onclick="exportContacts()">Exportar CSV</button>
+                <button class="btn btn-primary" onclick="openModal('contactModal')">+ Novo</button></div>
+            </div>
+            <div class="card">
+                <input type="text" class="search-input" id="contactSearch" placeholder="Buscar..." oninput="filterContacts()">
+                <table><thead><tr><th>Nome</th><th>Telefone</th><th>Tags</th><th>Acoes</th></tr></thead>
+                <tbody id="contactsTable"></tbody></table>
+                <div id="contactsEmpty" class="empty-state" style="display:none">Nenhum contato</div>
+            </div>
+        </div>
+
+        <!-- TEMPLATES -->
+        <div class="page" id="page-templates">
+            <div class="page-header"><div><h2>Templates</h2><p>Respostas rapidas reutilizaveis</p></div>
+                <div class="actions"><button class="btn btn-primary" onclick="openModal('templateModal')">+ Novo</button></div>
+            </div>
+            <div class="grid-2" id="templatesGrid"></div>
+            <div id="templatesEmpty" class="empty-state" style="display:none">Nenhum template</div>
+        </div>
+
+        <!-- SEND -->
+        <div class="page" id="page-send">
+            <div class="page-header"><div><h2>Enviar Mensagem</h2><p>Envie mensagem manualmente</p></div></div>
+            <div class="card" style="max-width:600px">
+                <div class="settings-group"><label>Telefone (DDD+Numero)</label><input type="text" id="sendPhone" placeholder="47999999999"></div>
+                <div class="settings-group"><label>Mensagem</label><textarea id="sendMsg" placeholder="Digite..."></textarea></div>
+                <button class="btn btn-primary" onclick="sendMsg()">Enviar</button>
+                <div id="sendResult" style="margin-top:12px;font-size:13px"></div>
+            </div>
+        </div>
+
+        <!-- CONFIG -->
+        <div class="page" id="page-config">
+            <div class="page-header"><div><h2>Configuracoes</h2><p>Configure seu bot</p></div></div>
+            <div class="card" style="max-width:600px">
+                <h3 style="margin-bottom:16px">WhatsApp</h3>
+                <div class="settings-group"><label>Numero WhatsApp</label><input type="text" id="cfgPhone" placeholder="47999999999"></div>
+                <div class="settings-group"><label>API Key Groq (gratuito)</label><input type="text" id="cfgGroqKey" placeholder="gsk_..."></div>
+                <div class="settings-group"><label class="hint">Obtenha gratis em console.groq.com</label></div>
+                <button class="btn btn-primary" onclick="saveConfig()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal">
+            <h3>Novo Contato</h3>
+            <div class="settings-group"><label>Nome</label><input type="text" id="cName"></div>
+            <div class="settings-group"><label>Telefone</label><input type="text" id="cPhone"></div>
+            <div class="settings-group"><label>Tags (uma por linha)</label><textarea id="cTags"></textarea></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('contactModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveContact()">Salvar</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal">
+            <h3>Novo Template</h3>
+            <div class="settings-group"><label>Nome</label><input type="text" id="tName"></div>
+            <div class="settings-group"><label>Categoria</label><select id="tCategory"><option value="geral">Geral</option><option value="suporte">Suporte</option><option value="vendas">Vendas</option></select></div>
+            <div class="settings-group"><label>Conteudo</label><textarea id="tContent" style="min-height:120px"></textarea></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('templateModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveTemplate()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allContacts=[], allTemplates=[], knowledge={};
+        function showPage(n,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+n).classList.add('active');if(el)el.classList.add('active');if(n==='knowledge')loadKnowledge();if(n==='contacts')loadContacts();if(n==='templates')loadTemplates();if(n==='config')loadConfig()}
+        function openModal(id){document.getElementById(id).classList.add('open')}
+        function closeModal(id){document.getElementById(id).classList.remove('open')}
+        document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})});
+
+        async function init(){
+            try{const r=await fetch('/api/auth/me');const d=await r.json();document.getElementById('businessName').textContent=d.business_name||d.name;document.getElementById('userEmail').textContent=d.email}catch(e){}
+            loadStats();
+        }
+        async function loadStats(){try{const r=await fetch('/api/tenant/stats');const d=await r.json();document.getElementById('statConvs').textContent=d.total_conversations;document.getElementById('statContacts').textContent=d.total_contacts;document.getElementById('statTemplates').textContent=d.total_templates;document.getElementById('statMsgs').textContent=d.total_messages}catch(e){}}
+
+        // KNOWLEDGE
+        async function loadKnowledge(){try{const r=await fetch('/api/knowledge');knowledge=await r.json();document.getElementById('kbBotName').value=knowledge.bot_name||'';document.getElementById('kbBusinessName').value=knowledge.business_name||'';document.getElementById('kbBusinessType').value=knowledge.business_type||'geral';document.getElementById('kbHours').value=knowledge.support_hours||'';document.getElementById('kbPhone').value=knowledge.phone||'';document.getElementById('kbWebsite').value=knowledge.website||'';document.getElementById('kbGreeting').value=knowledge.greeting||'';renderResponses()}catch(e){}}
+        function renderResponses(){const div=document.getElementById('kbResponses');const resp=knowledge.responses||{};div.innerHTML=Object.entries(resp).map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:8px"><input type="text" value="${k}" style="flex:1" onchange="updateResp('${k}',this.value,'key')"><input type="text" value="${v.replace(/"/g,'&quot;')}" style="flex:2" onchange="updateResp('${k}',this.value,'val')"><button class="btn btn-danger btn-sm" onclick="deleteResp('${k}')">X</button></div>`).join('')||'<p style="color:var(--text2);font-size:13px">Nenhuma resposta configurada</p>'}
+        function updateResp(oldKey,newKey,val){const r=knowledge.responses||{};if(val==='key'){const v=r[oldKey];delete r[oldKey];r[newKey]=v}else{r[oldKey]=newKey}knowledge.responses=r;renderResponses()}
+        function deleteResp(k){delete knowledge.responses[k];renderResponses()}
+        function addResponse(){const k=prompt('Keyword (ex: horario, preco, endereco):');if(!k)return;knowledge.responses=knowledge.responses||{};knowledge.responses[k]='';renderResponses()}
+        async function saveKnowledge(){knowledge.bot_name=document.getElementById('kbBotName').value;knowledge.business_name=document.getElementById('kbBusinessName').value;knowledge.business_type=document.getElementById('kbBusinessType').value;knowledge.support_hours=document.getElementById('kbHours').value;knowledge.phone=document.getElementById('kbPhone').value;knowledge.website=document.getElementById('kbWebsite').value;knowledge.greeting=document.getElementById('kbGreeting').value;await fetch('/api/knowledge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(knowledge)});alert('Salvo!')}
+
+        // CONTACTS
+        async function loadContacts(){try{const r=await fetch('/api/contacts');allContacts=await r.json();renderContacts(allContacts)}catch(e){}}
+        function renderContacts(items){const tb=document.getElementById('contactsTable');const em=document.getElementById('contactsEmpty');if(!items.length){tb.innerHTML='';em.style.display='block';return}em.style.display='none';tb.innerHTML=items.map(c=>`<tr><td>${c.name||'-'}</td><td>${c.phone}</td><td>${(c.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join(' ')}</td><td><button class="btn btn-danger btn-sm" onclick="deleteContact(${c.id})">Excluir</button></td></tr>`).join('')}
+        function filterContacts(){const q=document.getElementById('contactSearch').value.toLowerCase();renderContacts(allContacts.filter(c=>(c.name||'').toLowerCase().includes(q)||c.phone.includes(q)))}
+        async function saveContact(){const body={phone:document.getElementById('cPhone').value.trim(),name:document.getElementById('cName').value.trim(),tags:document.getElementById('cTags').value.split('\n').map(t=>t.trim()).filter(Boolean)};if(!body.phone)return alert('Telefone obrigatorio');await fetch('/api/contacts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});closeModal('contactModal');['cName','cPhone','cTags'].forEach(id=>document.getElementById(id).value='');loadContacts()}
+        async function deleteContact(id){if(!confirm('Excluir?'))return;await fetch('/api/contacts/'+id,{method:'DELETE'});loadContacts()}
+        function exportContacts(){window.location.href='/api/export/contacts'}
+
+        // TEMPLATES
+        async function loadTemplates(){try{const r=await fetch('/api/templates');allTemplates=await r.json();renderTemplates()}catch(e){}}
+        function renderTemplates(){const g=document.getElementById('templatesGrid');const em=document.getElementById('templatesEmpty');if(!allTemplates.length){g.innerHTML='';em.style.display='block';return}em.style.display='none';g.innerHTML=allTemplates.map(t=>`<div class="card" style="cursor:pointer" onclick="document.getElementById('sendMsg').value=\`${t.content.replace(/`/g,"\\`")}\`;showPage('send',document.querySelectorAll('.nav-item')[4])"><div style="display:flex;justify-content:space-between;align-items:center"><strong>${t.name}</strong><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteTemplate(${t.id})">X</button></div><span class="badge badge-success" style="margin-top:4px">${t.category}</span><p style="color:var(--text2);font-size:13px;margin-top:8px">${t.content.substring(0,100)}</p></div>`).join('')}
+        async function saveTemplate(){const body={name:document.getElementById('tName').value.trim(),content:document.getElementById('tContent').value.trim(),category:document.getElementById('tCategory').value};if(!body.name||!body.content)return alert('Preencha tudo');await fetch('/api/templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});closeModal('templateModal');['tName','tContent'].forEach(id=>document.getElementById(id).value='');loadTemplates()}
+        async function deleteTemplate(id){if(!confirm('Excluir?'))return;await fetch('/api/templates/'+id,{method:'DELETE'});loadTemplates()}
+
+        // SEND
+        async function sendMsg(){const p=document.getElementById('sendPhone').value.trim();const m=document.getElementById('sendMsg').value.trim();const r=document.getElementById('sendResult');if(!p||!m){r.innerHTML='<span style="color:var(--danger)">Preencha tudo</span>';return}try{const res=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:p,message:m})});const d=await res.json();r.innerHTML=d.ok?'<span style="color:var(--success)">Enviado!</span>':'<span style="color:var(--danger)">Erro</span>'}catch(e){r.innerHTML='<span style="color:var(--danger)">Erro</span>'}}
+
+        // CONFIG
+        async function loadConfig(){try{const r=await fetch('/api/tenant/config');const d=await r.json();document.getElementById('cfgPhone').value=d.whatsapp_phone||'';document.getElementById('cfgGroqKey').value=d.groq_api_key||''}catch(e){}}
+        async function saveConfig(){const body={whatsapp_phone:document.getElementById('cfgPhone').value.trim(),groq_api_key:document.getElementById('cfgGroqKey').value.trim()};await fetch('/api/tenant/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Salvo!')}
+
+        init();
+    </script>
+</body>
+</html>

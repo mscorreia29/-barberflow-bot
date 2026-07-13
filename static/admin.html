@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoAssist - Admin</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <style>
+        :root{--bg:#0b0e14;--bg2:#111520;--bg3:#161b28;--card:#1a1f2e;--border:#252d3d;--text:#e4e8f0;--text2:#8892a4;--primary:#00d4aa;--primary-dim:#00d4aa22;--accent:#6c5ce7;--danger:#ff4757;--warning:#ffa502}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+        .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+        .topbar h1{font-size:18px;font-weight:700} .topbar h1 span{color:var(--danger)}
+        .topbar a{color:var(--danger);text-decoration:none;font-size:13px;font-weight:600}
+        .container{max-width:1200px;margin:0 auto;padding:24px 32px}
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+        @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+        .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+        .stat-card .label{color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+        .stat-card .value{font-size:28px;font-weight:700;margin-top:4px;color:var(--danger)}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px} .card-header h3{font-size:16px;font-weight:600}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+        .btn-primary{background:var(--primary);color:#000} .btn-danger{background:var(--danger);color:#fff}
+        .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)} .btn-sm{padding:6px 12px;font-size:12px}
+        table{width:100%;border-collapse:collapse;font-size:14px}
+        th{text-align:left;padding:12px;color:var(--text2);font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+        td{padding:12px;border-bottom:1px solid var(--border)} tr:hover td{background:var(--bg3)}
+        .badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+        .badge-active{background:#00d4aa22;color:var(--primary)} .badge-inactive{background:#ff475722;color:var(--danger)}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+        .modal-overlay.open{display:flex} .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:520px}
+        .modal h3{font-size:18px;margin-bottom:20px}
+        .settings-group{margin-bottom:16px} .settings-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+        .settings-group input,.settings-group select{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit}
+        .settings-group input:focus{border-color:var(--primary)}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1><span>Admin</span> AutoAssist</h1>
+        <a href="/admin/logout">Sair</a>
+    </div>
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card"><div class="label">Total Tenants</div><div class="value" id="totalTenants">0</div></div>
+            <div class="stat-card"><div class="label">Ativos</div><div class="value" id="activeTenants">0</div></div>
+            <div class="stat-card"><div class="label">Total Conversas</div><div class="value" id="totalConvs">0</div></div>
+            <div class="stat-card"><div class="label">Total Mensagens</div><div class="value" id="totalMsgs">0</div></div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Tenants</h3>
+                <button class="btn btn-primary" onclick="openModal('tenantModal')">+ Novo Tenant</button>
+            </div>
+            <table>
+                <thead><tr><th>Nome</th><th>Email</th><th>Negocio</th><th>Plano</th><th>Status</th><th>Conversas</th><th>Acoes</th></tr></thead>
+                <tbody id="tenantsTable"></tbody>
+            </table>
+            <div id="tenantsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum tenant</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="tenantModal">
+        <div class="modal">
+            <h3>Novo Tenant</h3>
+            <div class="row">
+                <div class="settings-group"><label>Nome</label><input type="text" id="tName"></div>
+                <div class="settings-group"><label>Negocio</label><input type="text" id="tBusiness"></div>
+            </div>
+            <div class="settings-group"><label>Email</label><input type="email" id="tEmail"></div>
+            <div class="settings-group"><label>Senha</label><input type="password" id="tPassword"></div>
+            <div class="settings-group"><label>Tipo</label>
+                <select id="tType"><option value="barbearia">Barbearia</option><option value="salao">Salao</option><option value="clinica">Clinica</option><option value="academia">Academia</option><option value="restaurante">Restaurante</option><option value="loja">Loja</option><option value="servicos">Servicos</option><option value="geral">Outro</option></select>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('tenantModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createTenant()">Criar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id){document.getElementById(id).classList.add('open')}
+        function closeModal(id){document.getElementById(id).classList.remove('open')}
+        document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})});
+
+        let allTenants=[];
+        async function loadTenants(){
+            try{const r=await fetch('/admin/api/tenants');allTenants=await r.json();renderTenants()}catch(e){}
+        }
+        function renderTenants(){
+            const tb=document.getElementById('tenantsTable');
+            const em=document.getElementById('tenantsEmpty');
+            document.getElementById('totalTenants').textContent=allTenants.length;
+            document.getElementById('activeTenants').textContent=allTenants.filter(t=>t.status==='active').length;
+            let totalC=0,totalM=0;allTenants.forEach(t=>{totalC+=t.stats?.total_conversations||0;totalM+=t.stats?.total_messages||0});
+            document.getElementById('totalConvs').textContent=totalC;
+            document.getElementById('totalMsgs').textContent=totalM;
+            if(!allTenants.length){tb.innerHTML='';em.style.display='block';return}
+            em.style.display='none';
+            tb.innerHTML=allTenants.map(t=>`<tr>
+                <td><strong>${t.name}</strong></td>
+                <td>${t.email}</td>
+                <td>${t.business_name||'-'}</td>
+                <td><span class="badge badge-active">${t.plan}</span></td>
+                <td><span class="badge ${t.status==='active'?'badge-active':'badge-inactive'}">${t.status}</span></td>
+                <td>${t.stats?.total_conversations||0}</td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleTenant('${t.id}','${t.status}')">${t.status==='active'?'Desativar':'Ativar'}</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTenant('${t.id}')">Excluir</button>
+                </td>
+            </tr>`).join('');
+        }
+        async function createTenant(){
+            const body={name:document.getElementById('tName').value.trim(),email:document.getElementById('tEmail').value.trim(),password:document.getElementById('tPassword').value,business_name:document.getElementById('tBusiness').value.trim(),business_type:document.getElementById('tType').value};
+            if(!body.name||!body.email||!body.password)return alert('Preencha nome, email e senha');
+            const r=await fetch('/admin/api/tenants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+            const d=await r.json();
+            if(d.error)return alert(d.error);
+            closeModal('tenantModal');
+            ['tName','tBusiness','tEmail','tPassword'].forEach(id=>document.getElementById(id).value='');
+            loadTenants();
+        }
+        async function toggleTenant(id,currentStatus){
+            const newStatus=currentStatus==='active'?'inactive':'active';
+            await fetch('/admin/api/tenants/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});
+            loadTenants();
+        }
+        async function deleteTenant(id){
+            if(!confirm('Excluir este tenant e todos os dados?'))return;
+            await fetch('/admin/api/tenants/'+id,{method:'DELETE'});
+            loadTenants();
+        }
+        loadTenants();
+    </script>
+</body>
+</html>

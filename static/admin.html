@@ -11,8 +11,13 @@
         body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
         .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
         .topbar h1{font-size:18px;font-weight:700} .topbar h1 span{color:var(--danger)}
+        .topbar-right{display:flex;gap:16px;align-items:center}
         .topbar a{color:var(--danger);text-decoration:none;font-size:13px;font-weight:600}
+        .tabs{display:flex;gap:4px;background:var(--bg2);padding:8px 32px;border-bottom:1px solid var(--border)}
+        .tab{padding:10px 20px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:500;transition:all .15s}
+        .tab:hover{background:var(--bg3);color:var(--text)} .tab.active{background:var(--primary-dim);color:var(--primary);font-weight:600}
         .container{max-width:1200px;margin:0 auto;padding:24px 32px}
+        .tab-content{display:none} .tab-content.active{display:block}
         .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
         @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
         .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
@@ -28,40 +33,77 @@
         td{padding:12px;border-bottom:1px solid var(--border)} tr:hover td{background:var(--bg3)}
         .badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
         .badge-active{background:#00d4aa22;color:var(--primary)} .badge-inactive{background:#ff475722;color:var(--danger)}
+        .badge-info{background:#6c5ce722;color:var(--accent)}
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
-        .modal-overlay.open{display:flex} .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:520px}
+        .modal-overlay.open{display:flex} .modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
         .modal h3{font-size:18px;margin-bottom:20px}
         .settings-group{margin-bottom:16px} .settings-group label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
-        .settings-group input,.settings-group select{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit}
-        .settings-group input:focus{border-color:var(--primary)}
+        .settings-group input,.settings-group select,.settings-group textarea{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit}
+        .settings-group input:focus,.settings-group textarea:focus{border-color:var(--primary)}
+        .settings-group textarea{resize:vertical;min-height:100px}
         .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+        .template-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;transition:all .15s}
+        .template-card:hover{border-color:var(--primary)}
+        .template-card .t-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .template-card .t-name{font-weight:600;font-size:14px}
+        .template-card .t-cat{font-size:11px;color:var(--accent)}
+        .template-card .t-content{font-size:13px;color:var(--text2);line-height:1.5;max-height:80px;overflow:hidden}
+        .template-card .t-actions{display:flex;gap:8px;margin-top:12px}
+        .search-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:16px}
+        .search-input:focus{border-color:var(--primary)}
     </style>
 </head>
 <body>
     <div class="topbar">
         <h1><span>Admin</span> AutoAssist</h1>
-        <a href="/admin/logout">Sair</a>
+        <div class="topbar-right">
+            <a href="/dashboard" style="color:var(--primary)">Dashboard Owner</a>
+            <a href="/admin/logout">Sair</a>
+        </div>
+    </div>
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('tenants',this)">Tenants</div>
+        <div class="tab" onclick="showTab('templates',this)">Templates Globais</div>
     </div>
     <div class="container">
-        <div class="stats-row">
-            <div class="stat-card"><div class="label">Total Tenants</div><div class="value" id="totalTenants">0</div></div>
-            <div class="stat-card"><div class="label">Ativos</div><div class="value" id="activeTenants">0</div></div>
-            <div class="stat-card"><div class="label">Total Conversas</div><div class="value" id="totalConvs">0</div></div>
-            <div class="stat-card"><div class="label">Total Mensagens</div><div class="value" id="totalMsgs">0</div></div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <h3>Tenants</h3>
-                <button class="btn btn-primary" onclick="openModal('tenantModal')">+ Novo Tenant</button>
+        <!-- TENANTS TAB -->
+        <div class="tab-content active" id="tab-tenants">
+            <div class="stats-row">
+                <div class="stat-card"><div class="label">Total Tenants</div><div class="value" id="totalTenants">0</div></div>
+                <div class="stat-card"><div class="label">Ativos</div><div class="value" id="activeTenants">0</div></div>
+                <div class="stat-card"><div class="label">Total Conversas</div><div class="value" id="totalConvs">0</div></div>
+                <div class="stat-card"><div class="label">Total Mensagens</div><div class="value" id="totalMsgs">0</div></div>
             </div>
-            <table>
-                <thead><tr><th>Nome</th><th>Email</th><th>Negocio</th><th>Plano</th><th>Status</th><th>Conversas</th><th>Acoes</th></tr></thead>
-                <tbody id="tenantsTable"></tbody>
-            </table>
-            <div id="tenantsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum tenant</div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Tenants</h3>
+                    <button class="btn btn-primary" onclick="openModal('tenantModal')">+ Novo Tenant</button>
+                </div>
+                <table>
+                    <thead><tr><th>Nome</th><th>Email</th><th>Negocio</th><th>Plano</th><th>Status</th><th>Conversas</th><th>Acoes</th></tr></thead>
+                    <tbody id="tenantsTable"></tbody>
+                </table>
+                <div id="tenantsEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum tenant</div>
+            </div>
+        </div>
+
+        <!-- TEMPLATES TAB -->
+        <div class="tab-content" id="tab-templates">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Templates Globais</h3>
+                    <button class="btn btn-primary" onclick="openModal('templateModal')">+ Novo Template</button>
+                </div>
+                <p style="color:var(--text2);font-size:13px;margin-bottom:16px">Templates usados como base para novos tenants. Opcionalmente copiados ao criar conta.</p>
+                <input type="text" class="search-input" id="tmplSearch" placeholder="Buscar templates..." oninput="filterTemplates()">
+                <div class="template-grid" id="templatesGrid"></div>
+                <div id="templatesEmpty" style="text-align:center;padding:40px;color:var(--text2);display:none">Nenhum template criado</div>
+            </div>
         </div>
     </div>
 
+    <!-- TENANT MODAL -->
     <div class="modal-overlay" id="tenantModal">
         <div class="modal">
             <h3>Novo Tenant</h3>
@@ -81,58 +123,83 @@
         </div>
     </div>
 
+    <!-- TEMPLATE MODAL -->
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal">
+            <h3 id="tmplModalTitle">Novo Template</h3>
+            <input type="hidden" id="editTmplId">
+            <div class="settings-group"><label>Nome</label><input type="text" id="tmplName" placeholder="Ex: Boas-vindas"></div>
+            <div class="settings-group"><label>Categoria</label>
+                <select id="tmplCategory"><option value="geral">Geral</option><option value="suporte">Suporte</option><option value="vendas">Vendas</option><option value="marketing">Marketing</option></select>
+            </div>
+            <div class="settings-group"><label>Conteudo</label><textarea id="tmplContent" placeholder="Digite o conteudo do template..."></textarea></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-secondary" onclick="closeModal('templateModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveTemplate()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function showTab(name,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');el.classList.add('active');if(name==='templates')loadTemplates()}
         function openModal(id){document.getElementById(id).classList.add('open')}
         function closeModal(id){document.getElementById(id).classList.remove('open')}
         document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})});
 
+        // === TENANTS ===
         let allTenants=[];
-        async function loadTenants(){
-            try{const r=await fetch('/admin/api/tenants');allTenants=await r.json();renderTenants()}catch(e){}
-        }
+        async function loadTenants(){try{const r=await fetch('/admin/api/tenants');allTenants=await r.json();renderTenants()}catch(e){}}
         function renderTenants(){
-            const tb=document.getElementById('tenantsTable');
-            const em=document.getElementById('tenantsEmpty');
+            const tb=document.getElementById('tenantsTable');const em=document.getElementById('tenantsEmpty');
             document.getElementById('totalTenants').textContent=allTenants.length;
             document.getElementById('activeTenants').textContent=allTenants.filter(t=>t.status==='active').length;
             let totalC=0,totalM=0;allTenants.forEach(t=>{totalC+=t.stats?.total_conversations||0;totalM+=t.stats?.total_messages||0});
-            document.getElementById('totalConvs').textContent=totalC;
-            document.getElementById('totalMsgs').textContent=totalM;
-            if(!allTenants.length){tb.innerHTML='';em.style.display='block';return}
-            em.style.display='none';
+            document.getElementById('totalConvs').textContent=totalC;document.getElementById('totalMsgs').textContent=totalM;
+            if(!allTenants.length){tb.innerHTML='';em.style.display='block';return}em.style.display='none';
             tb.innerHTML=allTenants.map(t=>`<tr>
-                <td><strong>${t.name}</strong></td>
-                <td>${t.email}</td>
-                <td>${t.business_name||'-'}</td>
+                <td><strong>${t.name}</strong></td><td>${t.email}</td><td>${t.business_name||'-'}</td>
                 <td><span class="badge badge-active">${t.plan}</span></td>
                 <td><span class="badge ${t.status==='active'?'badge-active':'badge-inactive'}">${t.status}</span></td>
                 <td>${t.stats?.total_conversations||0}</td>
-                <td>
-                    <button class="btn btn-secondary btn-sm" onclick="toggleTenant('${t.id}','${t.status}')">${t.status==='active'?'Desativar':'Ativar'}</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteTenant('${t.id}')">Excluir</button>
-                </td>
+                <td><button class="btn btn-secondary btn-sm" onclick="toggleTenant('${t.id}','${t.status}')">${t.status==='active'?'Desativar':'Ativar'}</button> <button class="btn btn-danger btn-sm" onclick="deleteTenant('${t.id}')">Excluir</button></td>
             </tr>`).join('');
         }
         async function createTenant(){
             const body={name:document.getElementById('tName').value.trim(),email:document.getElementById('tEmail').value.trim(),password:document.getElementById('tPassword').value,business_name:document.getElementById('tBusiness').value.trim(),business_type:document.getElementById('tType').value};
             if(!body.name||!body.email||!body.password)return alert('Preencha nome, email e senha');
-            const r=await fetch('/admin/api/tenants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-            const d=await r.json();
-            if(d.error)return alert(d.error);
-            closeModal('tenantModal');
-            ['tName','tBusiness','tEmail','tPassword'].forEach(id=>document.getElementById(id).value='');
-            loadTenants();
+            const r=await fetch('/admin/api/tenants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();
+            if(d.error)return alert(d.error);closeModal('tenantModal');['tName','tBusiness','tEmail','tPassword'].forEach(id=>document.getElementById(id).value='');loadTenants();
         }
-        async function toggleTenant(id,currentStatus){
-            const newStatus=currentStatus==='active'?'inactive':'active';
-            await fetch('/admin/api/tenants/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});
-            loadTenants();
+        async function toggleTenant(id,s){await fetch('/admin/api/tenants/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s==='active'?'inactive':'active'})});loadTenants()}
+        async function deleteTenant(id){if(!confirm('Excluir este tenant e todos os dados?'))return;await fetch('/admin/api/tenants/'+id,{method:'DELETE'});loadTenants()}
+
+        // === TEMPLATES ===
+        let allTemplates=[];
+        async function loadTemplates(){try{const r=await fetch('/admin/api/templates');allTemplates=await r.json();renderTemplates()}catch(e){}}
+        function renderTemplates(items){
+            const list=items||allTemplates;const g=document.getElementById('templatesGrid');const em=document.getElementById('templatesEmpty');
+            if(!list.length){g.innerHTML='';em.style.display='block';return}em.style.display='none';
+            g.innerHTML=list.map(t=>`<div class="template-card">
+                <div class="t-header"><div class="t-name">${t.name}</div><span class="badge badge-info">${t.category}</span></div>
+                <div class="t-content">${t.content}</div>
+                <div class="t-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="editTemplate(${t.id})">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTemplate(${t.id})">Excluir</button>
+                </div>
+            </div>`).join('');
         }
-        async function deleteTenant(id){
-            if(!confirm('Excluir este tenant e todos os dados?'))return;
-            await fetch('/admin/api/tenants/'+id,{method:'DELETE'});
-            loadTenants();
+        function filterTemplates(){const q=document.getElementById('tmplSearch').value.toLowerCase();renderTemplates(allTemplates.filter(t=>t.name.toLowerCase().includes(q)||t.content.toLowerCase().includes(q)||t.category.includes(q)))}
+        function editTemplate(id){const t=allTemplates.find(x=>x.id===id);if(!t)return;document.getElementById('editTmplId').value=id;document.getElementById('tmplModalTitle').textContent='Editar Template';document.getElementById('tmplName').value=t.name;document.getElementById('tmplCategory').value=t.category;document.getElementById('tmplContent').value=t.content;openModal('templateModal')}
+        async function saveTemplate(){
+            const id=document.getElementById('editTmplId').value;
+            const body={name:document.getElementById('tmplName').value.trim(),content:document.getElementById('tmplContent').value.trim(),category:document.getElementById('tmplCategory').value};
+            if(!body.name||!body.content)return alert('Preencha nome e conteudo');
+            if(id){await fetch('/admin/api/templates/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}
+            else{await fetch('/admin/api/templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}
+            closeModal('templateModal');document.getElementById('editTmplId').value='';document.getElementById('tmplModalTitle').textContent='Novo Template';['tmplName','tmplContent'].forEach(x=>document.getElementById(x).value='');loadTemplates();
         }
+        async function deleteTemplate(id){if(!confirm('Excluir este template?'))return;await fetch('/admin/api/templates/'+id,{method:'DELETE'});loadTemplates()}
+
         loadTenants();
     </script>
 </body>

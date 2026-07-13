@@ -40,7 +40,7 @@ t.start()
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from flask import Flask, request, jsonify, send_file, send_from_directory, session, redirect, url_for
-from tenants import tenants
+from tenants import tenants, DATA_DIR, load_json, save_json
 from analytics import Analytics, ContactManager, TemplateManager
 
 app = Flask(__name__, static_folder='static')
@@ -452,6 +452,60 @@ def admin_delete_tenant(tid):
 @admin_required
 def admin_tenant_stats(tid):
     return jsonify(tenants.get_stats(tid))
+
+
+# ==================== ADMIN TEMPLATES ====================
+
+ADMIN_TEMPLATES_FILE = os.path.join(DATA_DIR, "admin_templates.json")
+
+def load_admin_templates():
+    return load_json(ADMIN_TEMPLATES_FILE, [])
+
+def save_admin_templates(data):
+    save_json(ADMIN_TEMPLATES_FILE, data)
+
+@app.route("/admin/api/templates", methods=["GET"])
+@admin_required
+def admin_get_templates():
+    return jsonify(load_admin_templates())
+
+@app.route("/admin/api/templates", methods=["POST"])
+@admin_required
+def admin_add_template():
+    data = request.get_json()
+    tmpls = load_admin_templates()
+    tmpl = {
+        "id": len(tmpls) + 1,
+        "name": data["name"],
+        "content": data["content"],
+        "category": data.get("category", "geral"),
+        "created_at": datetime.now().isoformat()
+    }
+    tmpls.append(tmpl)
+    save_admin_templates(tmpls)
+    return jsonify(tmpl)
+
+@app.route("/admin/api/templates/<int:tid>", methods=["PUT"])
+@admin_required
+def admin_update_template(tid):
+    data = request.get_json()
+    tmpls = load_admin_templates()
+    for t in tmpls:
+        if t["id"] == tid:
+            t["name"] = data.get("name", t["name"])
+            t["content"] = data.get("content", t["content"])
+            t["category"] = data.get("category", t["category"])
+            save_admin_templates(tmpls)
+            return jsonify(t)
+    return jsonify({"error": "not found"}), 404
+
+@app.route("/admin/api/templates/<int:tid>", methods=["DELETE"])
+@admin_required
+def admin_delete_template(tid):
+    tmpls = load_admin_templates()
+    tmpls = [t for t in tmpls if t["id"] != tid]
+    save_admin_templates(tmpls)
+    return jsonify({"ok": True})
 
 
 # ==================== HEALTH (PUBLIC) ====================

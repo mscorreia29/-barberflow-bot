@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoAssist - Painel</title>
+    <title>AutoAssist - Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -186,7 +186,7 @@
     <div class="sidebar">
         <div class="sidebar-brand">
             <h1><span>Auto</span>Assist</h1>
-            <small>Painel de Controle</small>
+            <small>Dashboard Owner</small>
         </div>
         <div class="sidebar-nav">
             <div class="nav-item active" onclick="showPage('dashboard', this)">
@@ -234,7 +234,7 @@
             </div>
         </div>
         <div class="sidebar-footer">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
                 <div><span class="status-dot connecting" id="statusDot"></span><span id="statusText" style="font-size:13px">Conectando...</span></div>
                 <a href="/logout" style="color:var(--danger);font-size:12px;text-decoration:none;font-weight:600">Sair</a>
             </div>
@@ -613,7 +613,7 @@
     </div>
 
     <script>
-        const API = '';
+        const API = '/dashboard';
         let startTime = null;
         let selectedConv = null;
         let allConversations = {};
@@ -666,7 +666,7 @@
         async function loadQR() {
             const box = document.getElementById('qrBox');
             try {
-                const res = await fetch(`${API}/qr`);
+                const res = await fetch(`/qr`);
                 if (res.ok) {
                     const blob = await res.blob();
                     box.innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="QR Code">`;

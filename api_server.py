@@ -458,8 +458,190 @@ def qr_code():
     return jsonify({"error": "QR Code ainda nao gerado"}), 404
 
 
+# ==================== OWNER DASHBOARD (ORIGINAL) ====================
+
+from bot import bot
+from config import BOT_NAME as ORIGINAL_BOT_NAME
+from scheduler import scheduler, campaigns
+from analytics import Analytics as GlobalAnalytics, ContactManager as GlobalContacts, TemplateManager as GlobalTemplates
+
+global_analytics = GlobalAnalytics()
+global_contacts = GlobalContacts()
+global_templates = GlobalTemplates()
+
+@app.route("/dashboard")
+@login_required
+def owner_dashboard():
+    return send_from_directory(app.static_folder, "index.html")
+
+@app.route("/dashboard/health")
+@login_required
+def owner_health():
+    return jsonify({"status": "ok", "bot": ORIGINAL_BOT_NAME, "bridge_running": bridge_status.get("running", False)})
+
+@app.route("/dashboard/stats")
+@login_required
+def owner_stats():
+    s = bot.get_stats()
+    s["bridge"] = bridge_status
+    s["conversations"] = {}
+    for phone, msgs in bot.conversations.items():
+        s["conversations"][phone] = [{"role": m["role"], "content": m["content"]} for m in msgs]
+    s["pending_notifications"] = scheduler.get_pending()
+    s["campaigns"] = campaigns.get_all()
+    s["analytics"] = {
+        "daily": global_analytics.get_daily_stats(7),
+        "avg_response_time": global_analytics.get_avg_response_time(),
+        "total_messages": global_analytics.get_total_messages(),
+        "hourly": global_analytics.get_hourly_distribution()
+    }
+    s["contacts"] = global_contacts.get_all()
+    s["templates"] = global_templates.get_all()
+    s["total_contacts"] = len(global_contacts.get_all())
+    try:
+        with open("/app/bridge.log") as f:
+            s["bridge_log"] = f.read()[-2000:]
+    except:
+        s["bridge_log"] = ""
+    return jsonify(s)
+
+@app.route("/dashboard/conversations/<phone>")
+@login_required
+def owner_conversation(phone):
+    if phone in bot.conversations:
+        return jsonify(bot.conversations[phone])
+    return jsonify([])
+
+@app.route("/dashboard/chat", methods=["POST"])
+@login_required
+def owner_chat():
+    try:
+        data = request.get_json()
+        phone = data.get("phone", "")
+        message = data.get("message", "")
+        is_group = data.get("is_group", False)
+        if not phone or not message:
+            return jsonify({"error": "phone e message obrigatorios"}), 400
+        analytics.log_message(phone, "inbound")
+        start = datetime.now()
+        response = bot.handle_message(phone, message, is_group)
+        elapsed = (datetime.now() - start).total_seconds()
+        analytics.log_response_time(phone, elapsed)
+        analytics.log_message(phone, "outbound")
+        global_contacts.update_last_message(phone)
+        return jsonify({"response": response, "phone": phone, "processed": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/dashboard/send", methods=["POST"])
+@login_required
+def owner_send():
+    data = request.get_json()
+    phone = data.get("phone", "")
+    message = data.get("message", "")
+    if not phone or not message:
+        return jsonify({"error": "phone e message obrigatorios"}), 400
+    try:
+        import requests as req
+        resp = req.post(f"http://127.0.0.1:{os.environ.get('PORT', 5000)}/chat",
+                       json={"phone": phone, "message": message, "is_group": False})
+        return jsonify({"ok": resp.ok})
+    except:
+        return jsonify({"ok": False})
+
+@app.route("/dashboard/contacts", methods=["GET"])
+@login_required
+def owner_get_contacts():
+    return jsonify(global_contacts.get_all())
+
+@app.route("/dashboard/contacts", methods=["POST"])
+@login_required
+def owner_add_contact():
+    data = request.get_json()
+    c = global_contacts.add(phone=data["phone"], name=data.get("name", ""), tags=data.get("tags", []), notes=data.get("notes", ""))
+    return jsonify(c)
+
+@app.route("/dashboard/contacts/<int:cid>", methods=["DELETE"])
+@login_required
+def owner_delete_contact(cid):
+    global_contacts.delete(cid)
+    return jsonify({"ok": True})
+
+@app.route("/dashboard/templates", methods=["GET"])
+@login_required
+def owner_get_templates():
+    return jsonify(global_templates.get_all())
+
+@app.route("/dashboard/templates", methods=["POST"])
+@login_required
+def owner_add_template():
+    data = request.get_json()
+    t = global_templates.add(name=data["name"], content=data["content"], category=data.get("category", "geral"))
+    return jsonify(t)
+
+@app.route("/dashboard/templates/<int:tid>", methods=["DELETE"])
+@login_required
+def owner_delete_template(tid):
+    global_templates.delete(tid)
+    return jsonify({"ok": True})
+
+@app.route("/dashboard/campaigns", methods=["GET"])
+@login_required
+def owner_get_campaigns():
+    return jsonify(campaigns.get_all())
+
+@app.route("/dashboard/campaigns", methods=["POST"])
+@login_required
+def owner_add_campaign():
+    data = request.get_json()
+    camp = campaigns.add(name=data.get("name", "Campanha"), message=data["message"], recipients=data.get("recipients", []), send_at=data["send_at"])
+    return jsonify(camp)
+
+@app.route("/dashboard/campaigns/<int:camp_id>", methods=["DELETE"])
+@login_required
+def owner_delete_campaign(camp_id):
+    campaigns.delete(camp_id)
+    return jsonify({"ok": True})
+
+@app.route("/dashboard/notifications/pending")
+@login_required
+def owner_pending():
+    return jsonify(scheduler.get_pending())
+
+@app.route("/dashboard/notifications/sent")
+@login_required
+def owner_sent():
+    return jsonify(scheduler.get_sent())
+
+@app.route("/dashboard/export/contacts")
+@login_required
+def owner_export_contacts():
+    import csv, io
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Nome", "Telefone", "Tags", "Notas", "Criado em"])
+    for c in global_contacts.get_all():
+        writer.writerow([c.get("name", ""), c.get("phone", ""), ",".join(c.get("tags", [])), c.get("notes", ""), c.get("created_at", "")])
+    from flask import Response
+    return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=contatos.csv"})
+
+@app.route("/dashboard/export/conversations")
+@login_required
+def owner_export_conversations():
+    import csv, io
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Telefone", "Papel", "Mensagem", "Timestamp"])
+    for phone, msgs in bot.conversations.items():
+        for m in msgs:
+            writer.writerow([phone, m["role"], m["content"], ""])
+    from flask import Response
+    return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=conversas.csv"})
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print(f"[API] AutoAssist Multi-Tenant em http://0.0.0.0:{port}", flush=True)
     print(f"[API] Admin: admin@autoassist.com / admin123", flush=True)
+    print(f"[API] Dashboard: /dashboard", flush=True)
     app.run(host='0.0.0.0', port=port, debug=False)

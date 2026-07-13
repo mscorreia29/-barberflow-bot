@@ -82,6 +82,14 @@ def get_tenant_templates(tid):
 
 # ==================== AUTH PAGES ====================
 
+@app.route("/")
+def root():
+    if session.get("tenant_id"):
+        return send_from_directory(app.static_folder, "tenant.html")
+    if session.get("is_admin"):
+        return send_from_directory(app.static_folder, "admin.html")
+    return redirect(url_for("login_page"))
+
 @app.route("/register", methods=["GET"])
 def register_page():
     if session.get("tenant_id"):

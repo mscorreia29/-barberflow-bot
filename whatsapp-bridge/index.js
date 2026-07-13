@@ -14,7 +14,7 @@ const { toBuffer } = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
-const API_PORT = process.env.PORT || 8080;
+const API_PORT = process.env.PORT || 5000;
 const BOT_API_URL = `http://127.0.0.1:${API_PORT}`;
 const AUTH_DIR = path.join(__dirname, 'auth_state');
 const GROUPS_FILE = path.join(__dirname, 'groups.json');
@@ -57,7 +57,7 @@ async function connectToWhatsApp() {
             auth: state,
             logger,
             printQRInTerminal: false,
-            browser: ['BarberFlow Bot', 'Chrome', '1.0.0'],
+            browser: ['AutoAssist', 'Chrome', '1.0.0'],
             markOnlineOnConnect: true
         });
 
@@ -151,7 +151,7 @@ async function connectToWhatsApp() {
 }
 
 console.log('[Bridge] ===========================================');
-console.log('[Bridge] BARBERFLOW WHATSAPP BOT');
+console.log('[Bridge] AUTOASSIST WHATSAPP BOT');
 console.log(`[Bridge] API: ${BOT_API_URL}`);
 console.log('[Bridge] ===========================================');
 connectToWhatsApp();

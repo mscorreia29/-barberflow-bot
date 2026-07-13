@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Groq (gratuito)
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 # Bot Settings
 BOT_NAME = "AutoAssist"

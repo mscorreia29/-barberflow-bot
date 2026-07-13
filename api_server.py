@@ -44,7 +44,7 @@ from tenants import tenants, DATA_DIR, load_json, save_json
 from analytics import Analytics, ContactManager, TemplateManager
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
+app.secret_key = os.environ.get("SECRET_KEY", "autoassist-barberflow-secret-2026")
 
 
 def login_required(f):
@@ -282,6 +282,23 @@ def tenant_dashboard():
 @app.route("/health")
 def health():
     return jsonify({"status": "ok", "bridge_running": bridge_status.get("running", False)})
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json()
+        phone = data.get("phone", "")
+        message = data.get("message", "")
+        is_group = data.get("is_group", False)
+        if not phone or not message:
+            return jsonify({"error": "phone e message obrigatorios"}), 400
+        from bot import bot
+        response = bot.handle_message(phone, message, is_group)
+        return jsonify({"response": response})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/auth/me")
 @login_required

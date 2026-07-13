@@ -169,9 +169,27 @@ class ContactManager:
 class TemplateManager:
     def __init__(self):
         self.templates = load_json(TEMPLATES_FILE, [])
+        if not self.templates:
+            self._create_defaults()
     
     def _save(self):
         save_json(TEMPLATES_FILE, self.templates)
+    
+    def _create_defaults(self):
+        defaults = [
+            {"name": "Boas-vindas", "category": "geral", "content": "Ola! Sou o AutoAssist. Como posso te ajudar?"},
+            {"name": "Horario de Atendimento", "category": "suporte", "content": "Nosso horario de atendimento e Segunda a Sabado, das 9h as 19h. Como posso te ajudar?"},
+            {"name": "Teste Gratis", "category": "vendas", "content": "Teste gratis por 7 dias! Acesso completo ao plano Pro.\n\nApos 7 dias, voce escolhe um plano:\n- Basico: R$ 49,90/mes\n- Pro: R$ 89,90/mes\n\nSem cartao. Comece agora:\nbarber-flow.store/barberflow"},
+            {"name": "Plano Basico", "category": "vendas", "content": "Plano Basico - R$ 49,90/mes\n\n- Ate 3 profissionais\n- Agendamento online\n- Notificacoes automaticas\n- Relatorios basicos\n\nQuer contratar? Acesse barber-flow.store/barberflow"},
+            {"name": "Plano Pro", "category": "vendas", "content": "Plano Pro - R$ 89,90/mes\n\n- Profissionais ilimitados\n- Tudo do Basico +\n- Comissoes detalhadas\n- Assinaturas recorrentes\n- Controle de estoque\n- Avaliacoes de clientes\n\nQuer contratar? Acesse barber-flow.store/barberflow"},
+            {"name": "Erro no Sistema", "category": "suporte", "content": "Desculpe pelo inconveniente! Para resolver:\n\n1. Limpe o cache do navegador (Ctrl+Shift+Delete)\n2. Acesse novamente: barber-flow.store/barberflow\n3. Se persistir, me descreva o erro\n\nEstou aqui para ajudar!"},
+            {"name": "Link do Sistema", "category": "geral", "content": "Acesse o sistema:\n\nbarber-flow.store/barberflow\n\nFunciona pelo navegador em qualquer dispositivo!"},
+            {"name": "Como Agendar", "category": "suporte", "content": "Para agendar um horario:\n\n1. Acesse barber-flow.store/barberflow\n2. Va em Agenda > Novo Agendamento\n3. Escolha o cliente, barbeiro e horario\n\nOu me envie: data, horario e nome do barbeiro!"},
+            {"name": "Vincular Barbeiro", "category": "suporte", "content": "Para vincular um barbeiro:\n\n1. Acesse barber-flow.store/barberflow\n2. Barbeiros > Novo Barbeiro\n3. Preencha os dados e salve\n\nO acesso e gerado na hora! Copie e envie pelo WhatsApp."},
+            {"name": "Agradecimento", "category": "geral", "content": "Obrigado por entrar em contato! Se precisar de mais alguma coisa, e so chamar. Estamos aqui para ajudar! 😊"},
+        ]
+        for t in defaults:
+            self.add(name=t["name"], content=t["content"], category=t["category"])
     
     def add(self, name, content, category="geral"):
         tmpl = {

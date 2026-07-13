@@ -577,20 +577,15 @@ def owner_conversation(phone):
 def owner_chat():
     try:
         data = request.get_json()
-        phone = data.get("phone", "")
+        phone = data.get("phone", "test_user")
         message = data.get("message", "")
-        is_group = data.get("is_group", False)
-        if not phone or not message:
-            return jsonify({"error": "phone e message obrigatorios"}), 400
-        analytics.log_message(phone, "inbound")
-        start = datetime.now()
-        response = bot.handle_message(phone, message, is_group)
-        elapsed = (datetime.now() - start).total_seconds()
-        analytics.log_response_time(phone, elapsed)
-        analytics.log_message(phone, "outbound")
-        global_contacts.update_last_message(phone)
+        if not message:
+            return jsonify({"error": "message obrigatorio"}), 400
+        response = bot.handle_message(phone, message, False)
         return jsonify({"response": response, "phone": phone, "processed": True})
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @app.route("/dashboard/send", methods=["POST"])

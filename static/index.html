@@ -846,7 +846,7 @@
         // === CONTACTS ===
         async function loadContacts() {
             try {
-                const res = await fetch(`${API}/api/contacts`);
+                const res = await fetch(`${API}/contacts`);
                 allContacts = await res.json();
                 renderContacts(allContacts);
             } catch (e) {}
@@ -901,9 +901,9 @@
             if (!body.phone) { alert('Telefone obrigatorio'); return; }
             try {
                 if (editingContactId) {
-                    await fetch(`${API}/api/contacts/${editingContactId}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                    await fetch(`${API}/contacts/${editingContactId}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
                 } else {
-                    await fetch(`${API}/api/contacts`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+                    await fetch(`${API}/contacts`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
                 }
                 closeModal('contactModal');
                 editingContactId = null;
@@ -915,7 +915,7 @@
 
         async function deleteContact(id) {
             if (!confirm('Excluir este contato?')) return;
-            await fetch(`${API}/api/contacts/${id}`, { method: 'DELETE' });
+            await fetch(`${API}/contacts/${id}`, { method: 'DELETE' });
             loadContacts();
         }
 
@@ -933,32 +933,32 @@
         }
 
         async function removeTagFromModal(contactId, tag) {
-            await fetch(`${API}/api/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
+            await fetch(`${API}/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
             await loadContacts();
             openTagModal(contactId);
         }
 
         async function removeTag(contactId, tag) {
-            await fetch(`${API}/api/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
+            await fetch(`${API}/contacts/${contactId}/tags/${tag}`, { method: 'DELETE' });
             loadContacts();
         }
 
         async function addTagToContact() {
             const tag = document.getElementById('newTagInput').value.trim();
             if (!tag) return;
-            await fetch(`${API}/api/contacts/${tagModalContactId}/tags`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ tag }) });
+            await fetch(`${API}/contacts/${tagModalContactId}/tags`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ tag }) });
             document.getElementById('newTagInput').value = '';
             await loadContacts();
             openTagModal(tagModalContactId);
         }
 
-        function exportContacts() { window.location.href = `${API}/api/export/contacts`; }
-        function exportConversations() { window.location.href = `${API}/api/export/conversations`; }
+        function exportContacts() { window.location.href = `${API}/export/contacts`; }
+        function exportConversations() { window.location.href = `${API}/export/conversations`; }
 
         // === TEMPLATES ===
         async function loadTemplates() {
             try {
-                const res = await fetch(`${API}/api/templates`);
+                const res = await fetch(`${API}/templates`);
                 const items = await res.json();
                 const grid = document.getElementById('templatesGrid');
                 const empty = document.getElementById('templatesEmpty');
@@ -984,7 +984,7 @@
                 category: document.getElementById('templateCategory').value
             };
             if (!body.name || !body.content) { alert('Preencha nome e conteudo'); return; }
-            await fetch(`${API}/api/templates`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            await fetch(`${API}/templates`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
             closeModal('templateModal');
             ['templateName','templateContent'].forEach(id => document.getElementById(id).value = '');
             loadTemplates();
@@ -992,7 +992,7 @@
 
         async function deleteTemplate(id) {
             if (!confirm('Excluir este template?')) return;
-            await fetch(`${API}/api/templates/${id}`, { method: 'DELETE' });
+            await fetch(`${API}/templates/${id}`, { method: 'DELETE' });
             loadTemplates();
         }
 
@@ -1003,7 +1003,7 @@
 
         async function loadSendTemplates() {
             try {
-                const res = await fetch(`${API}/api/templates`);
+                const res = await fetch(`${API}/templates`);
                 const items = await res.json();
                 const div = document.getElementById('sendTemplateList');
                 div.innerHTML = items.map(t => `
@@ -1022,7 +1022,7 @@
             const result = document.getElementById('sendResult');
             if (!phone || !msg) { result.innerHTML = '<span style="color:var(--danger)">Preencha todos os campos</span>'; return; }
             try {
-                const res = await fetch(`${API}/api/send`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, message: msg}) });
+                const res = await fetch(`${API}/send`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, message: msg}) });
                 const data = await res.json();
                 result.innerHTML = data.ok ? '<span style="color:var(--success)">Mensagem enviada!</span>' : `<span style="color:var(--danger)">${data.error || 'Erro'}</span>`;
                 document.getElementById('sendMsg').value = '';
@@ -1056,7 +1056,7 @@
         // === CAMPAIGNS ===
         async function loadCampaigns() {
             try {
-                const res = await fetch(`${API}/api/campaigns`);
+                const res = await fetch(`${API}/campaigns`);
                 const data = await res.json();
                 const items = data.campaigns || data || [];
                 const tbody = document.getElementById('campaignsTable');
@@ -1089,7 +1089,7 @@
                 send_at: document.getElementById('campSendAt').value
             };
             if (!body.name || !body.message) { alert('Preencha nome e mensagem'); return; }
-            await fetch(`${API}/api/campaigns`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+            await fetch(`${API}/campaigns`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
             closeModal('campModal');
             loadCampaigns();
             ['campName','campMessage','campRecipients','campSendAt'].forEach(id => document.getElementById(id).value = '');
@@ -1097,7 +1097,7 @@
 
         async function deleteCampaign(id) {
             if (!confirm('Excluir esta campanha?')) return;
-            await fetch(`${API}/api/campaigns/${id}`, { method: 'DELETE' });
+            await fetch(`${API}/campaigns/${id}`, { method: 'DELETE' });
             loadCampaigns();
         }
 
@@ -1107,8 +1107,8 @@
             const sentDiv = document.getElementById('sentNotifications');
             try {
                 const [pendRes, sentRes] = await Promise.all([
-                    fetch(`${API}/api/notifications/pending`),
-                    fetch(`${API}/api/notifications/sent`)
+                    fetch(`${API}/notifications/pending`),
+                    fetch(`${API}/notifications/sent`)
                 ]);
                 const pendData = await pendRes.json();
                 const sentData = await sentRes.json();

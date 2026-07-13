@@ -627,6 +627,33 @@ def owner_delete_contact(cid):
     global_contacts.delete(cid)
     return jsonify({"ok": True})
 
+@app.route("/dashboard/contacts/<int:cid>", methods=["PUT"])
+@login_required
+def owner_edit_contact(cid):
+    data = request.get_json()
+    c = global_contacts.update(cid, **data)
+    return jsonify(c or {"error": "not found"})
+
+@app.route("/dashboard/contacts/<int:cid>/tags/<tag>", methods=["DELETE"])
+@login_required
+def owner_remove_tag(cid, tag):
+    global_contacts.remove_tag(cid, tag)
+    return jsonify({"ok": True})
+
+@app.route("/dashboard/contacts/<int:cid>/tags", methods=["POST"])
+@login_required
+def owner_add_tag(cid):
+    data = request.get_json()
+    global_contacts.add_tag(cid, data["tag"])
+    return jsonify({"ok": True})
+
+@app.route("/dashboard/contacts/<int:cid>/notes", methods=["PUT"])
+@login_required
+def owner_edit_notes(cid):
+    data = request.get_json()
+    global_contacts.update(cid, notes=data.get("notes", ""))
+    return jsonify({"ok": True})
+
 @app.route("/dashboard/templates", methods=["GET"])
 @login_required
 def owner_get_templates():

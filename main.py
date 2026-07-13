@@ -1,4 +1,4 @@
-# WhatsApp Bot BarberFlow - Interface Principal
+# WhatsApp Bot AutoAssist - Interface Principal
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

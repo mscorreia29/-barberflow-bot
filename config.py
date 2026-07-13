@@ -1,4 +1,4 @@
-# WhatsApp Bot Barbearia - Configuração
+# AutoAssist Bot - Configuracao
 import os
 from dotenv import load_dotenv
 
@@ -8,7 +8,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Bot Settings
-BOT_NAME = "Suporte Barbearia"
+BOT_NAME = "AutoAssist"
 BOT_PHONE = os.getenv("BOT_PHONE", "")
 
 # Support Hours

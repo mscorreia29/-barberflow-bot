@@ -1,4 +1,4 @@
-# WhatsApp Bot BarberFlow - AI Handler (Groq) v5
+# WhatsApp Bot AutoAssist - AI Handler (Groq) v5
 from groq import Groq
 from config import GROQ_API_KEY, AI_MODEL, MAX_TOKENS
 from knowledge_base import KNOWLEDGE_BASE, PERGUNTAS_COMUNS

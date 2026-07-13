@@ -71,7 +71,7 @@ def login_page():
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BarberFlow Bot - Login</title>
+<title>AutoAssist - Login</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💈</text></svg>">
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
@@ -90,8 +90,8 @@ body{{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif
 </head>
 <body>
 <div class="login-card">
-<div class="icon"> BarberFlow</div>
-<h1><span>Barber</span>Flow Bot</h1>
+<div class="icon">⚡</div>
+<h1><span>Auto</span>Assist</h1>
 <p>Painel de Controle</p>
 {"<div class='error'>Credenciais invalidas</div>" if error else ""}
 <form method="POST" action="/login">

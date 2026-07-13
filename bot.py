@@ -1,4 +1,4 @@
-# WhatsApp Bot BarberFlow - Logica Principal (v5)
+# WhatsApp Bot AutoAssist - Logica Principal (v5)
 from datetime import datetime
 from config import BOT_NAME, IGNORE_GROUPS
 from ai_handler import get_ai_response, should_transfer_to_human

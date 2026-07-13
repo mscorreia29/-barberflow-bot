@@ -1,7 +1,7 @@
-# Base de Conhecimento - BarberFlow (v5)
+# Base de Conhecimento - AutoAssist (v5)
 KNOWLEDGE_BASE = {
     "sistema": {
-        "nome": "BarberFlow",
+        "nome": "AutoAssist",
         "url_site": "https://barber-flow.store",
         "url_app": "https://barber-flow.store/barberflow",
         "url_cadastro": "https://barber-flow.store/auth?mode=signup",
@@ -20,7 +20,7 @@ KNOWLEDGE_BASE = {
 
 QUICK_RESPONSES = {
     # Saudacao
-    "/ola": "Ola! Tudo bem? 😊 Sou do suporte do BarberFlow. Como posso te ajudar?",
+    "/ola": "Ola! Sou o AutoAssist. Como posso te ajudar?",
     "/obrigado": "De nada! Fico feliz em ajudar! 😄 Qualquer outra duvida, e so mandar!",
     
     # Links

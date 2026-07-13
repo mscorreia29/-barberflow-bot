@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BarberFlow Bot - Painel</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💈</text></svg>">
+    <title>AutoAssist - Painel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -185,7 +185,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-brand">
-            <h1><span>Barber</span>Flow Bot</h1>
+            <h1><span>Auto</span>Assist</h1>
             <small>Painel de Controle</small>
         </div>
         <div class="sidebar-nav">
@@ -266,13 +266,13 @@
                 </div>
                 <div class="card">
                     <div class="card-header"><h3>Informacoes</h3></div>
-                    <div class="info-row"><span class="label">Bot</span><span>Suporte BarberFlow</span></div>
+                    <div class="info-row"><span class="label">Bot</span><span>AutoAssist</span></div>
                     <div class="info-row"><span class="label">IA</span><span>Groq Llama 3.3 70B</span></div>
                     <div class="info-row"><span class="label">Suporte</span><span>Seg-Sab 9h-19h</span></div>
                     <div class="info-row"><span class="label">WhatsApp</span><span>(47) 99675-9164</span></div>
                     <div class="info-row"><span class="label">Contatos</span><span id="statContacts">0</span></div>
                     <div class="info-row"><span class="label">Deploy</span><span>Railway</span></div>
-                    <div style="margin-top:16px"><a href="https://barber-flow.store" target="_blank" class="btn btn-primary">Acessar BarberFlow</a></div>
+                    <div style="margin-top:16px"><a href="https://barber-flow.store" target="_blank" class="btn btn-primary">Acessar Sistema</a></div>
                 </div>
             </div>
             <div class="card">
@@ -464,7 +464,7 @@
             <div class="card" style="max-width:600px">
                 <div class="chat-area">
                     <div class="chat-messages" id="testChat">
-                        <div class="chat-bubble bot">Ola! Tudo bem? 😊 Sou do suporte do BarberFlow. Como posso te ajudar?</div>
+                        <div class="chat-bubble bot">Ola! Sou o AutoAssist. Como posso te ajudar?</div>
                     </div>
                     <div class="chat-input">
                         <input type="text" id="testInput" placeholder="Digite uma mensagem..." onkeypress="if(event.key==='Enter')sendTest()">
@@ -487,11 +487,11 @@
                     <div class="card-header"><h3>Geral</h3></div>
                     <div class="settings-group">
                         <label>Nome do Bot</label>
-                        <input type="text" id="cfgName" value="Suporte BarberFlow">
+                        <input type="text" id="cfgName" value="AutoAssist">
                     </div>
                     <div class="settings-group">
                         <label>Mensagem de Boas-vindas</label>
-                        <textarea id="cfgWelcome">Ola! Tudo bem? 😊 Sou do suporte do BarberFlow. Como posso te ajudar?</textarea>
+                        <textarea id="cfgWelcome">Ola! Sou o AutoAssist. Como posso te ajudar?</textarea>
                     </div>
                     <div class="settings-group">
                         <label>Horario de Suporte</label>
@@ -501,7 +501,7 @@
                 </div>
                 <div class="card">
                     <div class="card-header"><h3>Sistema</h3></div>
-                    <div class="info-row"><span class="label">Versao</span><span>5.0.0</span></div>
+                    <div class="info-row"><span class="label">Versao</span><span>5.1.0</span></div>
                     <div class="info-row"><span class="label">Uptime</span><span id="cfgUptime">-</span></div>
                     <div class="info-row"><span class="label">Bridge PID</span><span id="cfgPid">-</span></div>
                     <div class="info-row"><span class="label">Modelo IA</span><span>Llama 3.3 70B</span></div>
